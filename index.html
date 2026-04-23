@@ -6,13 +6,15 @@
     <title>AI Nomad: The Cancel Proof</title>
     <link rel="stylesheet" href="style.css">
     <link rel="manifest" href="manifest.json">
-    <!-- SDK Платформ -->
+    
+    <!-- 1. Сначала Firebase (версии compat для стабильности) -->
+    <script src="https://gstatic.com"></script>
+    <script src="https://gstatic.com"></script>
+    
+    <!-- 2. Затем SDK Платформ -->
     <script src="https://telegram.org"></script>
     <script src="https://yandex.ru"></script>
     <script src="https://unpkg.com"></script>
-    <!-- Firebase -->
-    <script src="https://gstatic.com"></script>
-    <script src="https://gstatic.com"></script>
 </head>
 <body>
     <div id="mining-overlay" style="display: none;"></div>
@@ -83,27 +85,23 @@
         <input type="text" id="username-input" placeholder="Никнейм..." maxlength="15">
         <button class="buy-btn" onclick="registerManual()">НАЧАТЬ</button>
     </div></div>
-
     <div id="leaderboard-overlay" class="modal"><div class="modal-content">
         <h2 style="color:var(--neon)">TOP 10 NOMADS</h2>
         <div id="leaderboard-list"></div>
         <button class="buy-btn" onclick="closeModal('leaderboard-overlay')">Назад</button>
     </div></div>
-
     <div id="offer-overlay" class="modal"><div class="modal-content" style="border-color: #ff4444;">
         <h2 style="color: #ff4444;">💰 ГРЯЗНАЯ СДЕЛКА</h2>
         <p id="offer-text"></p>
         <button class="buy-btn" style="background: #ff4444;" onclick="acceptOffer()">Принять</button>
         <button class="buy-btn" onclick="closeModal('offer-overlay')">Отказаться</button>
     </div></div>
-
     <div id="case-overlay" class="modal"><div class="modal-content">
         <div id="spinner-container"><div id="items-strip"></div><div id="pointer"></div></div>
         <h2 id="win-msg">Удачи!</h2>
         <p id="win-text" style="color:var(--neon); font-weight:bold;"></p>
         <button id="collect-btn" onclick="closeModal('case-overlay')" style="display:none;width:100%">Забрать</button>
     </div></div>
-
     <div id="donate-overlay" class="modal"><div class="modal-content">
         <h2>Магазин</h2><button class="buy-btn" onclick="processDonate(500)">500 💎 — 1.99$</button>
         <button class="buy-btn" onclick="closeModal('donate-overlay')">Закрыть</button>
@@ -111,10 +109,12 @@
 
     <div id="toast"></div>
 
+    <!-- Звуки (используем надежные ссылки) -->
     <audio id="snd-click" src="https://soundjay.com"></audio>
     <audio id="snd-win" src="https://soundjay.com"></audio>
     <audio id="snd-level" src="https://soundjay.com"></audio>
 
+    <!-- 3. Твой скрипт в самом конце -->
     <script src="script.js"></script>
 </body>
 </html>
