@@ -3,14 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>AI Nomad: The Cancel Proof</title>
+    <title>AI Nomad: Final Build</title>
     <link rel="stylesheet" href="style.css">
     <link rel="manifest" href="manifest.json">
-    <!-- SDK Платформ -->
     <script src="https://telegram.org"></script>
     <script src="https://yandex.ru"></script>
     <script src="https://unpkg.com"></script>
-    <!-- Firebase SDK -->
     <script src="https://gstatic.com"></script>
     <script src="https://gstatic.com"></script>
 </head>
@@ -21,7 +19,7 @@
             <div class="main-info">
                 <h1>LVL: <span id="level">1</span> | <span id="rank">Новичок</span></h1>
                 <div id="xp-bar-container"><div id="xp-fill"></div></div>
-                <div style="font-size: 0.8rem; color: var(--neon);">👤 <span id="display-username">Загрузка...</span></div>
+                <div style="font-size: 0.8rem; color: var(--neon);">👤 <span id="display-username">Номад</span></div>
             </div>
             <div class="stats-grid">
                 <div>💰 <span id="money">0</span>$</div>
@@ -33,6 +31,7 @@
 
         <main>
             <section id="action-zone">
+                <div id="ai-output">Система онлайн</div>
                 <div id="turbo-timer" style="display: none; color: #ffcc00; font-weight: bold;">🚀 ТУРБО: <span id="turbo-sec">30</span>с</div>
                 <button id="generate-btn">ГЕНЕРИРОВАТЬ</button>
                 <button id="turbo-btn" onclick="activateTurbo()">🚀 ТУРБО x10 (AD)</button>
@@ -90,13 +89,13 @@
     </div></div>
 
     <div id="leaderboard-overlay" class="modal"><div class="modal-content">
-        <h2 style="color:var(--neon)">TOP 10 NOMADS</h2>
-        <div id="leaderboard-list" style="text-align: left; margin-bottom: 15px; font-family: monospace;"></div>
+        <h2>TOP 10 NOMADS</h2>
+        <div id="leaderboard-list" style="text-align: left; margin-bottom: 15px;"></div>
         <button class="buy-btn" onclick="closeModal('leaderboard-overlay')">Назад</button>
     </div></div>
 
     <div id="donate-overlay" class="modal"><div class="modal-content">
-        <h2>Магазин</h2><button class="buy-btn" onclick="processDonate(500)">500 💎 — 1.99$</button>
+        <h2>Магазин Гемов</h2><button class="buy-btn" onclick="processDonate(500)">500 💎 — Купить</button>
         <button class="buy-btn" onclick="closeModal('donate-overlay')">Закрыть</button>
     </div></div>
 
