@@ -1,6 +1,6 @@
 // --- КОНФИГУРАЦИЯ FIREBASE ---
-const firebaseConfig = { databaseURL: "ВАШ_URL_ИЗ_FIREBASE" };
-if (firebaseConfig.databaseURL !== "ВАШ_URL_ИЗ_FIREBASE") {
+const firebaseConfig = { databaseURL: "https://ai-nomad-41a26-default-rtdb.europe-west1.firebasedatabase.app/" };
+if (firebaseConfig.databaseURL !== "https://ai-nomad-41a26-default-rtdb.europe-west1.firebasedatabase.app/") {
     firebase.initializeApp(firebaseConfig);
 }
 const db = (firebase.apps.length) ? firebase.database() : null;
