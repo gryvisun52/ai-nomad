@@ -6,9 +6,13 @@
     <title>AI Nomad: The Cancel Proof</title>
     <link rel="stylesheet" href="style.css">
     <link rel="manifest" href="manifest.json">
+    <!-- SDK Платформ -->
     <script src="https://telegram.org"></script>
     <script src="https://yandex.ru"></script>
     <script src="https://unpkg.com"></script>
+    <!-- Firebase SDK -->
+    <script src="https://gstatic.com"></script>
+    <script src="https://gstatic.com"></script>
 </head>
 <body>
     <div id="mining-overlay" style="display: none;"></div>
@@ -74,8 +78,8 @@
     <!-- Модалки -->
     <div id="auth-overlay" class="modal" style="display: none; z-index: 500;"><div class="modal-content">
         <h2>ВХОД НОМАДА</h2>
-        <input type="text" id="username-input" placeholder="Никнейм..." style="width:100%; padding:12px; background:#000; border:1px solid var(--neon); color:#fff; text-align:center; margin-bottom:10px;">
-        <button class="buy-btn" onclick="registerManual()">НАЧАТЬ</button>
+        <input type="text" id="username-input" placeholder="Никнейм..." maxlength="15" style="width:100%; padding:12px; background:#000; border:1px solid var(--neon); color:#fff; text-align:center; margin-bottom:10px;">
+        <button id="reg-btn" class="buy-btn" onclick="registerManual()">НАЧАТЬ</button>
     </div></div>
 
     <div id="case-overlay" class="modal"><div class="modal-content">
@@ -83,6 +87,12 @@
         <h2 id="win-msg">Удачи!</h2>
         <p id="win-text" style="color:var(--neon); font-weight:bold;"></p>
         <button id="collect-btn" onclick="closeModal('case-overlay')" style="display:none;width:100%">Забрать</button>
+    </div></div>
+
+    <div id="leaderboard-overlay" class="modal"><div class="modal-content">
+        <h2 style="color:var(--neon)">TOP 10 NOMADS</h2>
+        <div id="leaderboard-list" style="text-align: left; margin-bottom: 15px; font-family: monospace;"></div>
+        <button class="buy-btn" onclick="closeModal('leaderboard-overlay')">Назад</button>
     </div></div>
 
     <div id="donate-overlay" class="modal"><div class="modal-content">
