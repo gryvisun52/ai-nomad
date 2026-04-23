@@ -3,14 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>AI Nomad: Final Build</title>
+    <title>AI Nomad: The Cancel Proof</title>
     <link rel="stylesheet" href="style.css">
     <link rel="manifest" href="manifest.json">
     <!-- SDK Платформ -->
     <script src="https://telegram.org"></script>
     <script src="https://yandex.ru"></script>
     <script src="https://unpkg.com"></script>
-    <!-- Firebase SDK (Compat version для стабильности) -->
+    <!-- Firebase -->
     <script src="https://gstatic.com"></script>
     <script src="https://gstatic.com"></script>
 </head>
@@ -29,6 +29,7 @@
                 <div>💎 <span id="gems">100</span></div>
                 <div onclick="openLeaderboard()" style="cursor:pointer; color:var(--neon)">🏆 <span id="league-name">Бронза</span></div>
             </div>
+            <div style="font-size: 0.75rem; margin-top: 5px; color: #aaa;">😇 Репутация: <span id="reputation">100</span>%</div>
         </header>
 
         <main>
@@ -57,11 +58,11 @@
                 <div class="panel fab-lab">
                     <div id="fab-controls" class="locked">
                         <div class="fab-item">
-                            <button class="buy-btn" id="make-chip-btn" onclick="startResourceProduction('chips', 30)">Чип</button>
+                            <button class="buy-btn" id="make-chip-btn" onclick="startResourceProduction('chips', 500, 30)">Чип</button>
                             <div class="progress-min"><div id="progress-chips" class="fill"></div></div>
                         </div>
                         <div class="fab-item">
-                            <button class="buy-btn" id="make-code-btn" onclick="startResourceProduction('code', 20)">Код</button>
+                            <button class="buy-btn" id="make-code-btn" onclick="startResourceProduction('code', 300, 20)">Код</button>
                             <div class="progress-min"><div id="progress-code" class="fill"></div></div>
                         </div>
                     </div>
@@ -79,8 +80,21 @@
     <!-- Модалки -->
     <div id="auth-overlay" class="modal" style="display: none; z-index: 500;"><div class="modal-content">
         <h2>ВХОД НОМАДА</h2>
-        <input type="text" id="username-input" placeholder="Никнейм..." maxlength="15" style="width:100%; padding:12px; background:#000; border:1px solid var(--neon); color:#fff; text-align:center; margin-bottom:10px;">
-        <button id="reg-btn" class="buy-btn" onclick="registerManual()">НАЧАТЬ</button>
+        <input type="text" id="username-input" placeholder="Никнейм..." maxlength="15">
+        <button class="buy-btn" onclick="registerManual()">НАЧАТЬ</button>
+    </div></div>
+
+    <div id="leaderboard-overlay" class="modal"><div class="modal-content">
+        <h2 style="color:var(--neon)">TOP 10 NOMADS</h2>
+        <div id="leaderboard-list"></div>
+        <button class="buy-btn" onclick="closeModal('leaderboard-overlay')">Назад</button>
+    </div></div>
+
+    <div id="offer-overlay" class="modal"><div class="modal-content" style="border-color: #ff4444;">
+        <h2 style="color: #ff4444;">💰 ГРЯЗНАЯ СДЕЛКА</h2>
+        <p id="offer-text"></p>
+        <button class="buy-btn" style="background: #ff4444;" onclick="acceptOffer()">Принять</button>
+        <button class="buy-btn" onclick="closeModal('offer-overlay')">Отказаться</button>
     </div></div>
 
     <div id="case-overlay" class="modal"><div class="modal-content">
@@ -88,12 +102,6 @@
         <h2 id="win-msg">Удачи!</h2>
         <p id="win-text" style="color:var(--neon); font-weight:bold;"></p>
         <button id="collect-btn" onclick="closeModal('case-overlay')" style="display:none;width:100%">Забрать</button>
-    </div></div>
-
-    <div id="leaderboard-overlay" class="modal"><div class="modal-content">
-        <h2>TOP NOMADS</h2>
-        <div id="leaderboard-list" style="text-align: left; margin-bottom: 15px;"></div>
-        <button class="buy-btn" onclick="closeModal('leaderboard-overlay')">Назад</button>
     </div></div>
 
     <div id="donate-overlay" class="modal"><div class="modal-content">
