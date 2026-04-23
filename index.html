@@ -6,9 +6,11 @@
     <title>AI Nomad: Final Build</title>
     <link rel="stylesheet" href="style.css">
     <link rel="manifest" href="manifest.json">
+    <!-- SDK Платформ -->
     <script src="https://telegram.org"></script>
     <script src="https://yandex.ru"></script>
     <script src="https://unpkg.com"></script>
+    <!-- Firebase SDK (Compat version для стабильности) -->
     <script src="https://gstatic.com"></script>
     <script src="https://gstatic.com"></script>
 </head>
@@ -19,7 +21,7 @@
             <div class="main-info">
                 <h1>LVL: <span id="level">1</span> | <span id="rank">Новичок</span></h1>
                 <div id="xp-bar-container"><div id="xp-fill"></div></div>
-                <div style="font-size: 0.8rem; color: var(--neon);">👤 <span id="display-username">Номад</span></div>
+                <div style="font-size: 0.8rem; color: var(--neon);">👤 <span id="display-username">Загрузка...</span></div>
             </div>
             <div class="stats-grid">
                 <div>💰 <span id="money">0</span>$</div>
@@ -55,11 +57,11 @@
                 <div class="panel fab-lab">
                     <div id="fab-controls" class="locked">
                         <div class="fab-item">
-                            <button class="buy-btn" id="make-chip-btn" onclick="startResourceProduction('chips', 500, 30)">Чип</button>
+                            <button class="buy-btn" id="make-chip-btn" onclick="startResourceProduction('chips', 30)">Чип</button>
                             <div class="progress-min"><div id="progress-chips" class="fill"></div></div>
                         </div>
                         <div class="fab-item">
-                            <button class="buy-btn" id="make-code-btn" onclick="startResourceProduction('code', 300, 20)">Код</button>
+                            <button class="buy-btn" id="make-code-btn" onclick="startResourceProduction('code', 20)">Код</button>
                             <div class="progress-min"><div id="progress-code" class="fill"></div></div>
                         </div>
                     </div>
@@ -89,13 +91,13 @@
     </div></div>
 
     <div id="leaderboard-overlay" class="modal"><div class="modal-content">
-        <h2>TOP 10 NOMADS</h2>
+        <h2>TOP NOMADS</h2>
         <div id="leaderboard-list" style="text-align: left; margin-bottom: 15px;"></div>
         <button class="buy-btn" onclick="closeModal('leaderboard-overlay')">Назад</button>
     </div></div>
 
     <div id="donate-overlay" class="modal"><div class="modal-content">
-        <h2>Магазин Гемов</h2><button class="buy-btn" onclick="processDonate(500)">500 💎 — Купить</button>
+        <h2>Магазин</h2><button class="buy-btn" onclick="processDonate(500)">500 💎 — 1.99$</button>
         <button class="buy-btn" onclick="closeModal('donate-overlay')">Закрыть</button>
     </div></div>
 
