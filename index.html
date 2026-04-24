@@ -3,87 +3,106 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>AI Nomad: Final Build</title>
+    <title>AI Nomad: Final</title>
     <link rel="stylesheet" href="style.css">
-    <link rel="manifest" href="manifest.json">
     <script src="https://gstatic.com"></script>
     <script src="https://gstatic.com"></script>
 </head>
 <body>
+    <div id="mining-overlay" style="display: none;"></div>
     <div id="game-container">
         <header>
-            <div class="user-profile">
-                <span id="display-username">Загрузка...</span>
-                <span id="rank-badge">Новичок</span>
-            </div>
-            <div class="level-box">
-                <div class="level-label">Уровень <span id="level">1</span></div>
+            <div class="main-info">
+                <h1>LVL: <span id="level">1</span> | <span id="rank">Новичок</span></h1>
                 <div id="xp-bar-container"><div id="xp-fill"></div></div>
+                <div style="font-size: 0.8rem; color: #00ffcc;">👤 <span id="display-username">Загрузка...</span></div>
             </div>
-            <div class="stats-main">
-                <div class="stat-card">💰 <span id="money">0</span></div>
-                <div class="stat-card">💎 <span id="gems">100</span></div>
-            </div>
-            <div class="stats-sub">
-                <span>📈 Охват: <span id="reach">10</span></span>
-                <span>🏆 <span id="league-name">Бронза</span></span>
+            <div class="stats-grid">
+                <div>💰 <span id="money">0</span>$</div>
+                <div>📈 <span id="reach">10</span></div>
+                <div>💎 <span id="gems">100</span></div>
+                <div onclick="openLeaderboard()" style="cursor:pointer; color:#00ffcc">🏆 Рейтинг</div>
             </div>
         </header>
 
         <main>
             <section id="action-zone">
+                <div id="turbo-timer" style="display: none; color: #ffcc00; font-weight: bold;">🚀 ТУРБО: <span id="turbo-sec">30</span>с</div>
                 <button id="generate-btn">ГЕНЕРИРОВАТЬ</button>
+                <button id="turbo-btn" onclick="activateTurbo()">🚀 ТУРБО x10 (AD)</button>
             </section>
 
             <div id="tabs">
                 <button class="tab-btn active" onclick="showTab(event, 'farm')">🤖 Ферма</button>
-                <button class="tab-btn" onclick="showTab(event, 'craft')">🛠️ Цех</button>
+                <button class="tab-btn" onclick="showTab(event, 'craft')">🛠️ Крафт</button>
             </div>
 
+            <!-- ВКЛАДКА ФЕРМА -->
             <section id="farm" class="tab-content active">
-                <div class="income-info">Пассивный доход: +<span id="total-auto-income">0</span>$/с</div>
-                <div class="shop-grid">
+                <div class="panel">
+                    <h3 style="margin-top:0">Доход: +<span id="total-auto-income">0</span>$/с</h3>
                     <button class="buy-btn" onclick="buyFarm('bot1', 100, 5)">
-                        Бот-писатель (<span id="count-bot1">0</span>) <span>$</span><span id="price-bot1">100</span>
+                        <span>Бот-писатель (<span id="count-bot1">0</span>)</span>
+                        <b>$<span id="price-bot1">100</span></b>
                     </button>
                     <button class="buy-btn" onclick="buyFarm('bot2', 800, 30)">
-                        Стрим-бот (<span id="count-bot2">0</span>) <span>$</span><span id="price-bot2">800</span>
+                        <span>Стрим-бот (<span id="count-bot2">0</span>)</span>
+                        <b>$<span id="price-bot2">800</span></b>
                     </button>
                 </div>
             </section>
 
+            <!-- ВКЛАДКА КРАФТ (ИСПРАВЛЕНО) -->
             <section id="craft" class="tab-content" style="display:none;">
-                <div class="resource-panel">
-                    <div class="res-item">⚙️ <span id="res-chips">0</span></div>
-                    <div class="res-item">💾 <span id="res-code">0</span></div>
+                <div class="panel">
+                    <h4>🏭 Производство ресурсов (с 5 LVL)</h4>
+                    <div id="fab-controls" class="locked">
+                        <button class="buy-btn" id="make-chip-btn" onclick="startResourceProduction('chips', 500, 30)">Чип ($500)</button>
+                        <div class="progress-min"><div id="progress-chips" class="fill"></div></div>
+                        <button class="buy-btn" id="make-code-btn" onclick="startResourceProduction('code', 300, 20)">Код ($300)</button>
+                        <div class="progress-min"><div id="progress-code" class="fill"></div></div>
+                    </div>
                 </div>
-                <button class="buy-btn special" onclick="openCase()">📦 Открыть кейс (50 💎)</button>
-                <div class="fab-section">
-                    <button class="buy-btn" id="make-chip-btn" onclick="startResourceProduction('chips', 500, 30)">Чип</button>
-                    <div class="progress-min"><div id="progress-chips" class="fill"></div></div>
-                    <button class="buy-btn" id="make-code-btn" onclick="startResourceProduction('code', 300, 20)">Код</button>
-                    <div class="progress-min"><div id="progress-code" class="fill"></div></div>
+
+                <div class="panel">
+                    <h4>🎒 Твой Инвентарь</h4>
+                    <div class="res-row">⚙️ Чипы: <span id="res-chips">0</span> | 💾 Код: <span id="res-code">0</span></div>
+                    <button class="buy-btn" onclick="openCase()" style="background:#ffcc00; color:#000; justify-content:center; font-weight:bold;">📦 Открыть Кейс (50 💎)</button>
+                    
+                    <div class="craft-item">
+                        <b>🤖 Нейро-Шлем</b>
+                        <p>30⚙️, 20💾 | Бонус: x2 XP</p>
+                        <button class="buy-btn" id="btn-craft-helmet" onclick="craftItem('helmet', 30, 20)">Скрафтить</button>
+                    </div>
+                    <div class="craft-item">
+                        <b>💎 Крипто-Сервер</b>
+                        <p>150⚙️, 100💾 | Бонус: +1💎/30с</p>
+                        <button class="buy-btn" id="btn-craft-server" onclick="craftItem('server', 150, 100)">Скрафтить</button>
+                    </div>
                 </div>
             </section>
         </main>
     </div>
 
-    <!-- Модалки -->
-    <div id="auth-overlay" class="modal-fs" style="display:none;">
-        <div class="modal-box">
-            <h2>AI NOMAD</h2>
-            <input type="text" id="username-input" placeholder="Никнейм..." maxlength="12">
-            <button class="buy-btn" onclick="registerManual()">НАЧАТЬ</button>
-        </div>
-    </div>
+    <!-- Модалки и асеты -->
+    <div id="case-overlay" class="modal"><div class="modal-content">
+        <div id="spinner-container"><div id="items-strip"></div><div id="pointer"></div></div>
+        <h2 id="win-msg">Выигрыш!</h2>
+        <p id="win-text" style="color:#00ffcc; font-size:1.2rem; font-weight:bold;"></p>
+        <button class="buy-btn" onclick="closeModal('case-overlay')" style="justify-content:center">Забрать</button>
+    </div></div>
 
-    <div id="case-overlay" class="modal-fs" style="display:none;">
-        <div class="modal-box case-win">
-            <h2 id="win-msg">ВЫИГРЫШ!</h2>
-            <div id="win-text"></div>
-            <button class="buy-btn" onclick="closeModal('case-overlay')">ПРИНЯТЬ</button>
-        </div>
-    </div>
+    <div id="auth-overlay" class="modal" style="display:none;"><div class="modal-content">
+        <h2>ВХОД НОМАДА</h2>
+        <input type="text" id="username-input" placeholder="Никнейм..." maxlength="12" style="width:100%; padding:12px; margin-bottom:15px; text-align:center;">
+        <button class="buy-btn" onclick="registerManual()" style="justify-content:center">НАЧАТЬ</button>
+    </div></div>
+
+    <div id="leaderboard-overlay" class="modal"><div class="modal-content">
+        <h2 style="color:#00ffcc">TOP 10 NOMADS</h2>
+        <div id="leaderboard-list"></div>
+        <button class="buy-btn" onclick="closeModal('leaderboard-overlay')" style="justify-content:center">Назад</button>
+    </div></div>
 
     <div id="toast"></div>
     <script src="script.js"></script>
