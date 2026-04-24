@@ -3,12 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>AI Nomad</title>
-    <!-- Используем относительные пути для GitHub Pages -->
+    <title>AI Nomad: Final</title>
     <link rel="stylesheet" href="style.css">
     <link rel="manifest" href="manifest.json">
-    
-    <!-- Подключаем Firebase через официальный Google CDN -->
+    <!-- Firebase SDK (Compat версии самые стабильные для браузера) -->
     <script src="https://gstatic.com"></script>
     <script src="https://gstatic.com"></script>
 </head>
@@ -18,39 +16,45 @@
             <div class="main-info">
                 <h1>LVL: <span id="level">1</span></h1>
                 <div id="xp-bar-container"><div id="xp-fill"></div></div>
-                <div style="font-size: 0.8rem; color: #00ffcc;">👤 <span id="display-username">Номад</span></div>
+                <div style="font-size: 0.8rem; color: #00ffcc;">👤 <span id="display-username">Загрузка...</span></div>
             </div>
             <div class="stats-grid">
                 <div>💰 <span id="money">0</span>$</div>
                 <div>📈 <span id="reach">10</span></div>
                 <div>💎 <span id="gems">100</span></div>
-                <div style="color:#00ffcc">🏆 <span id="league-name">Бронза</span></div>
+                <div onclick="openLeaderboard()" style="cursor:pointer; color:#00ffcc">🏆 Рейтинг</div>
             </div>
         </header>
 
         <main>
             <section id="action-zone">
-                <div id="ai-output">Система готова</div>
+                <div id="ai-output">Система онлайн</div>
                 <button id="generate-btn">ГЕНЕРИРОВАТЬ</button>
-                <button id="turbo-btn" onclick="activateTurbo()" style="margin-top:10px; background:#ffcc00; color:#000; border:none; padding:10px; border-radius:8px; width:100%; font-weight:bold; cursor:pointer;">🚀 ТУРБО x10</button>
             </section>
 
-            <div id="tabs" style="display:flex; gap:5px; margin-top:10px;">
+            <div id="tabs">
                 <button class="tab-btn active" onclick="showTab(event, 'farm')">🤖 Ферма</button>
-                <button class="tab-btn" onclick="showTab(event, 'craft')">🛠️ Крафт</button>
+                <button class="tab-btn" onclick="showTab(event, 'craft')">🛠️ Цех</button>
             </div>
 
             <section id="farm" class="tab-content active">
                 <div class="panel">
                     <h3>Доход: +<span id="total-auto-income">0</span>$/с</h3>
-                    <button class="buy-btn" onclick="buyFarm('bot1', 100, 5)">Бот-писатель (<span id="count-bot1">0</span>)</button>
-                    <button class="buy-btn" onclick="buyFarm('bot2', 800, 30)">Стрим-бот (<span id="count-bot2">0</span>)</button>
+                    <button class="buy-btn" onclick="buyFarm('bot1', 100, 5)">Писатель (<span id="count-bot1">0</span>) | <span id="price-bot1">100</span>$</button>
+                    <button class="buy-btn" onclick="buyFarm('bot2', 800, 30)">Стример (<span id="count-bot2">0</span>) | <span id="price-bot2">800</span>$</button>
                 </div>
             </section>
 
             <section id="craft" class="tab-content" style="display:none;">
                 <div class="panel">
-                    <div>⚙️: <span id="res-chips">0</span> | 💾: <span id="res-code">0</span></div>
+                    <h4>🏭 Производство ресурсов</h4>
+                    <button class="buy-btn" id="make-chip-btn" onclick="startResourceProduction('chips', 500, 30)">Чип ($500)</button>
+                    <div class="progress-min"><div id="progress-chips" class="fill"></div></div>
+                    
+                    <button class="buy-btn" id="make-code-btn" onclick="startResourceProduction('code', 300, 20)">Код ($300)</button>
+                    <div class="progress-min"><div id="progress-code" class="fill"></div></div>
+                    <hr>
+                    <div class="res-row">⚙️: <span id="res-chips">0</span> | 💾: <span id="res-code">0</span></div>
                     <button class="buy-btn" onclick="openCase()" style="background:#ffcc00; color:#000;">Кейс (50 💎)</button>
                 </div>
             </section>
@@ -58,16 +62,23 @@
     </div>
 
     <!-- Модалки -->
-    <div id="auth-overlay" class="modal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.9); z-index:1000; justify-content:center; align-items:center;">
-        <div class="modal-content" style="background:#161625; padding:20px; border:1px solid #00ffcc; text-align:center;">
-            <h2>ВХОД</h2>
-            <input type="text" id="username-input" placeholder="Никнейм..." style="width:100%; padding:10px; margin:10px 0;">
-            <button class="buy-btn" onclick="registerManual()">НАЧАТЬ</button>
+    <div id="auth-overlay" class="modal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.95); z-index:1000; justify-content:center; align-items:center;">
+        <div class="modal-content" style="background:#161625; padding:30px; border:1px solid #00ffcc; text-align:center; border-radius:15px;">
+            <h2>ВХОД НОМАДА</h2>
+            <input type="text" id="username-input" placeholder="Твой ник..." maxlength="12" style="width:100%; padding:12px; margin:15px 0; background:#000; color:#fff; border:1px solid #00ffcc;">
+            <button class="buy-btn" onclick="registerManual()">НАЧАТЬ ИГРУ</button>
         </div>
     </div>
 
-    <div id="toast" style="position:fixed; bottom:20px; left:50%; transform:translateX(-50%); background:#00ffcc; color:#000; padding:10px 20px; border-radius:20px; opacity:0; transition:0.5s; pointer-events:none;"></div>
+    <div id="case-overlay" class="modal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.9); z-index:1000; justify-content:center; align-items:center;">
+        <div class="modal-content" style="background:#1a1a2e; padding:20px; border:1px solid #ffcc00; text-align:center; min-width:280px;">
+            <h2 id="win-msg">Выигрыш!</h2>
+            <p id="win-text" style="font-size:2rem; color:#00ffcc; margin:10px 0;"></p>
+            <button class="buy-btn" onclick="closeModal('case-overlay')">Забрать</button>
+        </div>
+    </div>
 
+    <div id="toast"></div>
     <script src="script.js"></script>
 </body>
 </html>

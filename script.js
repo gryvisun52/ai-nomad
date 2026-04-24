@@ -10,32 +10,28 @@ let db = null;
 let state = { 
     username: localStorage.getItem('ai_nomad_user') || "",
     money: 0, reach: 10, gems: 100, level: 1, xp: 0, nextXp: 100, autoIncome: 0, 
-    res: { chips: 0, code: 0 }, inventory: { helmet: false },
-    farm: { bot1: { count: 0, cost: 100, inc: 5 }, bot2: { count: 0, cost: 800, inc: 30 } }
+    res: { chips: 0, code: 0 }, resCosts: { chips: 500, code: 300 },
+    inventory: { helmet: false },
+    farm: { bot1: { count: 0, cost: 100, inc: 5 }, bot2: { count: 0, cost: 800, inc: 30 } },
+    production: { chips: false, code: false }
 };
 
-// Инициализация
+// 1. Инициализация
 function startApp() {
-    // Проверка, загрузился ли Firebase из CDN
     if (typeof firebase !== 'undefined') {
         try {
             firebase.initializeApp(firebaseConfig);
             db = firebase.database();
-            console.log("Firebase Connected");
             if (state.username) loadCloud();
-        } catch (e) { console.error("Firebase Init Error:", e); }
-    } else {
-        console.warn("Offline Mode: Firebase scripts blocked");
+        } catch (e) { console.warn("Cloud offline"); }
     }
-
-    if (!state.username) {
-        document.getElementById('auth-overlay').style.display = 'flex';
-    }
+    if (!state.username) document.getElementById('auth-overlay').style.display = 'flex';
     updateUI();
 }
 
+// 2. Сохранение
 function save() {
-    localStorage.setItem('ai_nomad_save', JSON.stringify(state));
+    localStorage.setItem('ai_nomad_final_v1', JSON.stringify(state));
     if (db && state.username) {
         const safeName = state.username.replace(/[.#$[\]]/g, "_");
         db.ref('players/' + safeName).set(state);
@@ -45,63 +41,78 @@ function save() {
 function loadCloud() {
     const safeName = state.username.replace(/[.#$[\]]/g, "_");
     db.ref('players/' + safeName).once('value').then(s => {
-        if (s.exists()) {
-            state = {...state, ...s.val()};
-            updateUI();
-        }
+        if (s.exists()) { state = {...state, ...s.val()}; updateUI(); }
     });
 }
 
 function registerManual() {
-    const val = document.getElementById('username-input').value.trim();
-    if (val.length > 2) {
-        state.username = val;
-        localStorage.setItem('ai_nomad_user', val);
+    const v = document.getElementById('username-input').value.trim();
+    if (v.length > 2) {
+        state.username = v;
+        localStorage.setItem('ai_nomad_user', v);
         document.getElementById('auth-overlay').style.display = 'none';
-        updateUI();
-        save();
+        updateUI(); save();
     }
 }
 
+// 3. Геймплей
 document.getElementById('generate-btn').onclick = () => {
     state.money += state.reach;
     state.reach++;
-    state.xp += 20;
+    state.xp += 15;
     while (state.xp >= state.nextXp) {
-        state.xp -= state.nextXp;
-        state.level++;
-        state.nextXp *= 1.6;
-        showToast("🆙 НОВЫЙ LVL!");
+        state.xp -= state.nextXp; state.level++; state.nextXp *= 1.6;
+        showToast(`🆙 LVL ${state.level}`);
     }
-    updateUI();
-    save();
+    updateUI(); save();
 };
 
 function buyFarm(id, b, i) {
-    let price = Math.floor(b * Math.pow(1.15, state.farm[id].count));
-    if (state.money >= price) {
-        state.money -= price;
-        state.farm[id].count++;
-        state.autoIncome += i;
-        updateUI();
-        save();
-    } else {
-        showToast("Не хватает денег!");
-    }
+    let p = Math.floor(b * Math.pow(1.15, state.farm[id].count));
+    if (state.money >= p) {
+        state.money -= p; state.farm[id].count++; state.autoIncome += i;
+        updateUI(); save();
+    } else showToast("Мало денег!");
+}
+
+function startResourceProduction(type, base, sec) {
+    if (state.level < 5) return showToast("Доступно с 5 LVL!");
+    let cost = state.resCosts[type] || base;
+    if (state.money < cost || state.production[type]) return;
+
+    state.money -= cost;
+    state.production[type] = true;
+    state.resCosts[type] = Math.floor(cost * 1.2); // Инфляция цен
+
+    const bar = document.getElementById(`progress-${type}`);
+    bar.style.transition = `width ${sec}s linear`;
+    setTimeout(() => bar.style.width = "100%", 50);
+
+    setTimeout(() => {
+        state.res[type]++;
+        state.production[type] = false;
+        bar.style.transition = "none"; bar.style.width = "0%";
+        updateUI(); save();
+    }, sec * 1000);
+    updateUI();
 }
 
 function openCase() {
-    if (state.gems < 50) return showToast("Мало 💎");
+    if (state.gems < 50) return showToast("Нужно 50 💎");
     state.gems -= 50;
-    const items = ['⚙️','💾','💎','👑'];
-    const p = items[Math.floor(Math.random()*items.length)];
-    if(p==='⚙️') state.res.chips+=5;
-    if(p==='💾') state.res.code+=5;
-    if(p==='💎') state.gems+=5;
-    if(p==='👑') state.money+=1000;
-    showToast(`Выпало: ${p}`);
-    updateUI();
-    save();
+    
+    // Шанс бриллианта 1%
+    let rng = Math.random() * 100;
+    let prize = "";
+    if (rng < 1) { prize = "💎"; state.gems += 1; } 
+    else if (rng < 20) { prize = "⚙️"; state.res.chips += 5; }
+    else if (rng < 40) { prize = "💾"; state.res.code += 5; }
+    else if (rng < 50) { prize = "👑"; state.money += 5000; }
+    else { prize = "💩"; }
+
+    document.getElementById('case-overlay').style.display = 'flex';
+    document.getElementById('win-text').innerText = prize;
+    updateUI(); save();
 }
 
 function updateUI() {
@@ -112,7 +123,17 @@ function updateUI() {
     document.getElementById('res-chips').innerText = state.res.chips;
     document.getElementById('res-code').innerText = state.res.code;
     document.getElementById('total-auto-income').innerText = state.autoIncome;
-    document.getElementById('xp-fill').style.width = Math.min(100, (state.xp/state.nextXp*100)) + "%";
+    document.getElementById('xp-fill').style.width = (state.xp/state.nextXp*100) + "%";
+    
+    // Обновление цен в Цеху
+    document.getElementById('make-chip-btn').innerText = `Чип ($${state.resCosts.chips})`;
+    document.getElementById('make-code-btn').innerText = `Код ($${state.resCosts.code})`;
+
+    Object.keys(state.farm).forEach(id => {
+        let p = Math.floor(state.farm[id].cost * Math.pow(1.15, state.farm[id].count));
+        document.getElementById(`price-${id}`).innerText = p.toLocaleString();
+        document.getElementById(`count-${id}`).innerText = state.farm[id].count;
+    });
 }
 
 function showTab(e, id) {
@@ -122,16 +143,12 @@ function showTab(e, id) {
     e.currentTarget.classList.add('active');
 }
 
-function showToast(t) {
-    const el = document.getElementById('toast');
-    el.innerText = t; el.style.opacity = 1;
-    setTimeout(() => el.style.opacity = 0, 2000);
+function closeModal(id) { document.getElementById(id).style.display='none'; }
+function showToast(t) { 
+    const el = document.getElementById('toast'); 
+    el.innerText = t; el.style.opacity = 1; 
+    setTimeout(() => el.style.opacity = 0, 2000); 
 }
 
 window.onload = startApp;
-setInterval(() => {
-    if (state.autoIncome > 0) {
-        state.money += state.autoIncome;
-        updateUI();
-    }
-}, 1000);
+setInterval(() => { if(state.autoIncome > 0) { state.money += state.autoIncome; updateUI(); } }, 1000);
