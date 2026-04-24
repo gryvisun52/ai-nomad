@@ -1,58 +1,36 @@
 :root { --neon: #00ffcc; --bg: #0b0b14; --panel: #161625; --gold: #ffcc00; }
 * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
 body, html { height: 100%; margin: 0; background: var(--bg); color: #fff; font-family: sans-serif; overflow: hidden; }
-
 #game-container { max-width: 500px; height: 100%; margin: 0 auto; display: flex; flex-direction: column; padding: 10px; }
-
 header { background: var(--panel); padding: 12px; border-radius: 12px; border: 1px solid #2d2d3f; flex-shrink: 0; }
-.user-info { display: flex; justify-content: space-between; font-size: 0.9rem; color: var(--neon); margin-bottom: 5px; }
-#rank-badge { background: var(--neon); color: #000; padding: 2px 6px; border-radius: 4px; font-weight: bold; font-size: 0.7rem; }
+.user-info { display: flex; justify-content: space-between; align-items: center; color: var(--neon); margin-bottom: 5px; }
+#ad-bonus-btn { background: var(--gold); border: none; padding: 4px 8px; border-radius: 4px; font-weight: bold; font-size: 0.6rem; cursor: pointer; }
 .xp-container { display: flex; align-items: center; gap: 10px; }
 #xp-bar-container { flex-grow: 1; height: 8px; background: #222; border-radius: 4px; overflow: hidden; }
 #xp-fill { width: 0%; height: 100%; background: var(--neon); transition: 0.3s; }
 .res-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 5px; margin-top: 10px; }
 .res-item { background: #1a1a2e; padding: 8px 2px; border-radius: 6px; text-align: center; font-size: 0.75rem; font-weight: bold; border: 1px solid #333; }
-
 main { flex-grow: 1; overflow-y: auto; padding-top: 10px; display: flex; flex-direction: column; }
 #action-zone { background: #111; padding: 15px; border-radius: 15px; text-align: center; border: 1px solid #333; margin-bottom: 10px; }
 #turbo-timer-display { display: none; color: var(--gold); font-weight: bold; font-size: 0.8rem; margin-bottom: 5px; }
 #generate-btn { width: 100%; padding: 15px; background: var(--neon); border: none; font-weight: 900; border-radius: 12px; cursor: pointer; color: #000; font-size: 1.1rem; }
 #turbo-btn { width: 100%; margin-top: 8px; background: var(--gold); border: none; padding: 8px; border-radius: 10px; font-weight: bold; cursor: pointer; color:#000; font-size: 0.8rem; }
-
 #tabs { display: flex; gap: 5px; margin-bottom: 10px; flex-shrink: 0; }
 .tab-btn { flex: 1; padding: 10px; border: none; background: #222; color: #777; border-radius: 8px; font-weight: bold; cursor: pointer; }
 .tab-btn.active { background: var(--panel); color: var(--neon); border-bottom: 2px solid var(--neon); }
-
-.tab-content { display: none; }
-.tab-content.active { display: block; }
-
 .panel { background: var(--panel); padding: 12px; border-radius: 12px; border-left: 3px solid var(--neon); margin-bottom: 10px; }
-.income-label { margin: 0 0 10px 0; font-size: 0.85rem; color: #aaa; }
-
 .buy-btn { width: 100%; margin-top: 6px; padding: 12px; background: #2a2a40; border: 1px solid #444; color: #fff; border-radius: 8px; cursor: pointer; display: flex; justify-content: space-between; align-items: center; font-size: 0.85rem; }
 .buy-btn * { pointer-events: none; }
-.buy-btn b { color: var(--neon); }
-.case-btn { background: var(--gold); color: #000; border: none; font-weight: bold; justify-content: center; margin-bottom: 15px; }
-
-.craft-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 10px; }
-.craft-card { background: #000; border: 1px solid #333; padding: 10px; border-radius: 12px; text-align: center; display: flex; flex-direction: column; }
+.craft-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 10px; }
+.craft-card { background: #000; border: 1px solid #333; padding: 10px; border-radius: 12px; text-align: center; }
 .craft-icon { font-size: 2rem; margin-bottom: 5px; }
-.craft-card b { display: block; font-size: 0.8rem; color: var(--neon); }
-.craft-trigger { font-size: 0.65rem !important; padding: 8px !important; }
 .gold-border { border-color: var(--gold); }
-
-.locked { opacity: 0.3; pointer-events: none; filter: grayscale(1); }
-.progress-min { width: 100%; height: 6px; background: #000; margin-top: 4px; border-radius: 3px; overflow: hidden; margin-bottom: 10px; }
+.progress-min { width: 100%; height: 6px; background: #000; margin-top: 5px; border-radius: 3px; overflow: hidden; }
 .progress-min .fill { width: 0%; height: 100%; background: #ff00ff; transition: linear; }
-
 .modal { position: fixed; inset: 0; background: rgba(0,0,0,0.95); z-index: 1000; display: none; align-items: center; justify-content: center; padding: 20px; }
 .modal-content { background: var(--panel); border: 1px solid var(--neon); padding: 25px; border-radius: 20px; width: 100%; max-width: 350px; text-align: center; }
-#username-input { width: 100%; padding: 12px; margin-bottom: 15px; background: #000; color: #fff; border: 1px solid var(--neon); text-align: center; border-radius: 8px; }
-
 #spinner-container { width: 100%; height: 80px; background: #000; overflow: hidden; position: relative; border: 2px solid var(--gold); margin: 15px 0; border-radius: 8px; }
 #items-strip { display: flex; position: absolute; left: 0; top: 0; transition: 4s cubic-bezier(0.1, 0, 0.1, 1); }
 .strip-item { min-width: 80px; height: 80px; display: flex; align-items: center; justify-content: center; font-size: 2rem; border-right: 1px solid #222; }
 #pointer { position: absolute; left: 50%; width: 4px; height: 100%; background: red; z-index: 10; transform: translateX(-50%); }
-
-#win-text { font-size: 1.5rem; color: var(--neon); font-weight: bold; margin: 10px 0; }
-#toast { position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%); background: var(--neon); color: #000; padding: 10px 20px; border-radius: 20px; font-weight: bold; opacity: 0; transition: 0.4s; z-index: 2000; pointer-events: none; }
+#toast { position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%); background: var(--neon); color: #000; padding: 10px 20px; border-radius: 20px; font-weight: bold; opacity: 0; transition: 0.4s; z-index: 2000; pointer-events: none; font-size: 0.85rem; }
