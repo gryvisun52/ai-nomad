@@ -3,17 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>AI Nomad: Total Edition</title>
+    <title>AI Nomad: Fixed Edition</title>
     <link rel="stylesheet" href="style.css">
     <script src="https://gstatic.com"></script>
     <script src="https://gstatic.com"></script>
-    <script src="https://telegram.org"></script>
-    <script src="https://unpkg.com"></script>
 </head>
 <body>
     <div id="mining-overlay"></div>
     <div id="game-container">
-        <!-- ВЕРХНЯЯ ПАНЕЛЬ С РЕСУРСАМИ -->
         <header id="main-stats">
             <div class="user-info">
                 <span id="display-username">Загрузка...</span>
@@ -32,95 +29,90 @@
         </header>
 
         <main>
-            <!-- ЗОНА КЛИКА -->
             <section id="action-zone">
                 <div id="turbo-timer-display">⚡ ТУРБО: <span id="turbo-sec">30</span>с</div>
                 <button id="generate-btn">ГЕНЕРИРОВАТЬ</button>
                 <button id="turbo-btn" onclick="activateTurbo()">🚀 ТУРБО x10 (AD)</button>
             </section>
 
-            <!-- ТАБЫ -->
             <nav id="tabs">
                 <button class="tab-btn active" onclick="showTab(event, 'farm')">🤖 Ферма</button>
                 <button class="tab-btn" onclick="showTab(event, 'craft')">🛠️ Крафт</button>
                 <button class="tab-btn" onclick="showTab(event, 'lab')">🧬 Лаба</button>
             </nav>
 
-            <!-- КОНТЕНТ ТАБОВ -->
             <section id="farm" class="tab-content active">
                 <div class="panel">
-                    <p class="income-label">Пассивный доход: +<span id="total-auto-income">0</span>$/с</p>
+                    <p class="income-label">Доход: +<span id="total-auto-income">0</span>$/с</p>
                     <button class="buy-btn" onclick="buyFarm('bot1', 100, 5)">
                         <span>Писатель (<span id="count-bot1">0</span>)</span>
-                        <b>$<span id="price-bot1">100</span></b>
+                        <b id="price-bot1">$100</b>
                     </button>
                     <button class="buy-btn" onclick="buyFarm('bot2', 800, 30)">
                         <span>Стример (<span id="count-bot2">0</span>)</span>
-                        <b>$<span id="price-bot2">800</span></b>
+                        <b id="price-bot2">$800</b>
                     </button>
                 </div>
             </section>
 
-            <section id="craft" class="tab-content">
-                <div class="panel">
-                    <h4>🏭 Цех ресурсов</h4>
-                    <button class="buy-btn" id="make-chip-btn" onclick="startResourceProduction('chips', 500, 30)">Создать Чип</button>
-                    <div class="progress-min"><div id="progress-chips" class="fill"></div></div>
-                    <button class="buy-btn" id="make-code-btn" onclick="startResourceProduction('code', 300, 20)">Собрать Код</button>
-                    <div class="progress-min"><div id="progress-code" class="fill"></div></div>
+            <section id="craft" class="tab-content" style="display:none;">
+                <div class="panel fab-lab">
+                    <h4>🏭 Цех ресурсов (с 5 LVL)</h4>
+                    <div id="fab-controls" class="locked">
+                        <button class="buy-btn" id="make-chip-btn" onclick="startResourceProduction('chips', 500, 30)">Чип ($500)</button>
+                        <div class="progress-min"><div id="progress-chips" class="fill"></div></div>
+                        <button class="buy-btn" id="make-code-btn" onclick="startResourceProduction('code', 300, 20)">Код ($300)</button>
+                        <div class="progress-min"><div id="progress-code" class="fill"></div></div>
+                    </div>
                 </div>
                 <div class="panel">
                     <div class="inventory-row">⚙️: <span id="res-chips">0</span> | 💾: <span id="res-code">0</span></div>
                     <button class="buy-btn case-btn" onclick="openCase()">📦 ОТКРЫТЬ КЕЙС (50 💎)</button>
-                    <div class="craft-card">
-                        <b>🤖 Нейро-Шлем</b>
-                        <p>30⚙️, 20💾 | Бонус: x2 XP</p>
-                        <button class="buy-btn craft-trigger" id="btn-craft-helmet" onclick="craftItem('helmet', 30, 20)">Крафт</button>
-                    </div>
-                    <div class="craft-card gold-border">
-                        <b>💎 Крипто-Сервер</b>
-                        <p>150⚙️, 100💾 | Бонус: +1💎/30с</p>
-                        <button class="buy-btn craft-trigger" id="btn-craft-server" onclick="craftItem('server', 150, 100)">Крафт</button>
+                    <div class="craft-grid">
+                        <div class="craft-card">
+                            <div class="craft-icon">🤖</div>
+                            <b>Нейро-Шлем</b>
+                            <button class="buy-btn" id="btn-craft-helmet" onclick="craftItem('helmet', 30, 20)">30⚙️/20💾</button>
+                        </div>
+                        <div class="craft-card gold-border">
+                            <div class="craft-icon">💎</div>
+                            <b>Крипто-Сервер</b>
+                            <div id="server-mining-info" style="font-size:0.6rem; color:#888; margin-bottom:4px;">Удача: 0.1%</div>
+                            <button class="buy-btn" id="btn-craft-server" onclick="craftItem('server', 150, 100)">150⚙️/100💾</button>
+                            <button class="buy-btn" id="btn-upgrade-server" style="display:none; background:var(--gold); color:#000" onclick="upgradeServerPower()">Разгон</button>
+                        </div>
                     </div>
                 </div>
             </section>
 
-            <section id="lab" class="tab-content">
+            <section id="lab" class="tab-content" style="display:none;">
                 <div class="panel">
-                    <h4>🧬 Лаборатория опыта</h4>
-                    <p class="income-label">Генерация XP: +<span id="auto-xp-income">0</span>/с</p>
+                    <h4>🧬 Quantum Lab</h4>
+                    <p class="income-label">XP: +<span id="auto-xp-income">0</span>/с | Буст: x<span id="lab-mult-display">1.0</span></p>
                     <button class="buy-btn" onclick="upgradeLab()">
-                        <span>Улучшить ИИ (<span id="lab-lvl">0</span>)</span>
-                        <b>$<span id="lab-cost">500</span></b>
+                        <span>Апгрейд Ядра (<span id="lab-lvl">0</span>)</span>
+                        <b id="lab-cost-display">$500</b>
                     </button>
-                    <div class="progress-min" style="height:10px"><div id="progress-xp-bar" class="fill"></div></div>
                 </div>
             </section>
         </main>
     </div>
 
-    <!-- ОКНА -->
+    <!-- МОДАЛКИ -->
     <div id="auth-overlay" class="modal" style="display:none;"><div class="modal-content">
         <h2>ВХОД</h2>
-        <div class="auth-buttons">
-            <button class="auth-btn tg" onclick="authVia('TG')">Telegram</button>
-            <button class="auth-btn vk" onclick="authVia('VK')">VK</button>
-        </div>
-        <input type="text" id="username-input" placeholder="Имя игрока..." maxlength="12">
-        <button class="buy-btn" onclick="registerManual()" style="justify-content:center; background:var(--neon); color:#000">ИГРАТЬ</button>
+        <input type="text" id="username-input" placeholder="Никнейм..." maxlength="12">
+        <button class="buy-btn" onclick="registerManual()" style="justify-content:center; background:var(--neon); color:#000">НАЧАТЬ</button>
     </div></div>
-
-    <div id="case-overlay" class="modal"><div class="modal-content">
+    <div id="case-overlay" class="modal" style="display:none;"><div class="modal-content">
         <div id="spinner-container"><div id="items-strip"></div><div id="pointer"></div></div>
-        <h2 id="win-msg">Удачи!</h2>
+        <h2 id="win-msg">УДАЧИ!</h2>
         <p id="win-text"></p>
-        <button class="buy-btn" onclick="closeModal('case-overlay')" style="justify-content:center">Забрать</button>
+        <button class="buy-btn" onclick="closeModal('case-overlay')" style="justify-content:center">ЗАКРЫТЬ</button>
     </div></div>
-
-    <div id="leaderboard-overlay" class="modal"><div class="modal-content">
-        <h2>ТОП 10</h2>
-        <div id="leaderboard-list"></div>
-        <button class="buy-btn" onclick="closeModal('leaderboard-overlay')" style="justify-content:center">Назад</button>
+    <div id="leaderboard-overlay" class="modal" style="display:none;"><div class="modal-content">
+        <h2>ТОП 10</h2><div id="leaderboard-list"></div>
+        <button class="buy-btn" onclick="closeModal('leaderboard-overlay')" style="justify-content:center">НАЗАД</button>
     </div></div>
 
     <div id="toast"></div>
