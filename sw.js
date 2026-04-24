@@ -1,4 +1,4 @@
-const CACHE_NAME = 'ai-nomad-v36';
+const CACHE_NAME = 'ai-nomad-v38';
 const ASSETS = [
   './',
   './index.html',
