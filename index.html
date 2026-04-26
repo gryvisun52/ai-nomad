@@ -130,6 +130,8 @@
         ];
         const imgP = new Image();
         const imgE = new Image(); imgE.src = 'https://img.icons8.com/?size=100&id=BjByu959rSNb&format=png&color=000000';
+        const imgWall = new Image(); 
+imgWall.src = 'https://img.icons8.com/?size=100&id=7U5jR3e3D6HV&format=png&color=000000';
 
         let game = { 
             user: "", gold: 100, chips: 0, mine: 0, tower: 0, stage: 0, 
@@ -365,7 +367,19 @@
         function draw() {
             const t = TOWERS[game.tower] || TOWERS[TOWERS.length-1];
             ctx.fillStyle = t.bg; ctx.fillRect(0,0,canvas.width, canvas.height);
-            ctx.fillStyle = "#333"; ctx.fillRect(wall.x, wall.y, wall.w, wall.h);
+            // Отрисовка стены картинками
+if (imgWall.complete) {
+    const blockSize = wall.w; // Ширина блока равна ширине стены
+    for (let currentY = wall.y; currentY < wall.y + wall.h; currentY += blockSize) {
+        // Рисуем блоки один над другим
+        let drawH = Math.min(blockSize, (wall.y + wall.h) - currentY);
+        ctx.drawImage(imgWall, wall.x, currentY, wall.w, drawH);
+    }
+} else {
+    // Резервный вариант, если картинка не загрузилась
+    ctx.fillStyle = "#333";
+    ctx.fillRect(wall.x, wall.y, wall.w, wall.h);
+}
             ctx.fillStyle = "#0a0a0a"; ctx.fillRect(0, canvas.height - 130, canvas.width, 130);
             drawEntity(imgP, player.x, canvas.height, false);
             drawEntity(imgE, enemy.x, canvas.height, true);
