@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>Crypto Archer: Names Restored</title>
+    <style>
+        :root { --neon: #00f2fe; --pink: #ff0055; --gold: #f1c40f; --green: #00ff88; }
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; outline: none; }
+        body { margin: 0; overflow: hidden; background: #050505; font-family: 'Segoe UI', sans-serif; color: white; -webkit-user-select: none; touch-action: none; }
+        canvas { display: none; width: 100vw; height: 100vh; position: fixed; top: 0; left: 0; z-index: 5; will-change: transform; }
+        #reg-screen, #hub { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; z-index: 100; background: radial-gradient(circle at center, #1a1a2e 0%, #050505 100%); }
+        #hub { justify-content: flex-start; overflow-y: auto; padding: 20px 15px 140px; display: none; }
+        #reg-screen { justify-content: center; }
+        .stats-bar { width: 100%; max-width: 400px; display: flex; justify-content: space-around; background: rgba(0,0,0,0.85); padding: 12px; border-radius: 20px; border: 1px solid #333; margin-bottom: 15px; flex-shrink: 0; }
+        .menu-container { width: 100%; max-width: 450px; display: flex; flex-direction: column; gap: 10px; }
+        .section { background: rgba(255,255,255,0.05); border: 1px solid #444; padding: 15px; border-radius: 20px; text-align: center; }
+        .tower-list { display: flex; flex-direction: column-reverse; gap: 5px; margin-bottom: 12px; max-height: 120px; overflow-y: auto; padding: 5px; background: rgba(0,0,0,0.3); border-radius: 10px; border: 1px solid #222; }
+        .up-card { background: #111; border: 1px solid #333; padding: 10px; border-radius: 12px; margin-bottom: 8px; display: flex; align-items: center; gap: 12px; }
+        .up-icon { width: 42px; height: 42px; background: #222; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 20px; flex-shrink: 0; overflow: hidden; }
+        .up-icon img { width: 100%; height: 100%; object-fit: cover; }
+        .up-btn { background: #27ae60; border: none; color: white; padding: 10px; border-radius: 8px; font-weight: bold; min-width: 85px; cursor: pointer; }
+        .up-btn:disabled { background: #222 !important; color: #555 !important; cursor: default !important; opacity: 0.6; }
+        .mine-box { width: 100%; height: 10px; background: #000; border-radius: 5px; overflow: hidden; border: 1px solid #333; margin: 10px 0; }
+        #mine-fill { height: 100%; width: 0%; background: var(--green); box-shadow: 0 0 10px var(--green); }
+        #battle-top-ui { position: fixed; top: env(safe-area-inset-top, 10px); left: 0; width: 100%; display: none; z-index: 50; pointer-events: none; justify-content: center; }
+        .battle-header { width: 92%; background: rgba(0,0,0,0.85); padding: 10px 15px; border-radius: 15px; display: flex; justify-content: space-between; align-items: center; border: 1px solid #444; backdrop-filter: blur(5px); }
+        #weaponDock { position: fixed; top: calc(env(safe-area-inset-top, 10px) + 60px); left: 50%; transform: translateX(-50%); display: none; gap: 8px; z-index: 60; width: 95%; justify-content: center; pointer-events: auto; }
+        .w-btn { flex: 1; max-width: 110px; height: 50px; background: rgba(10,10,10,0.95); border: 2px solid #444; color: white; border-radius: 12px; font-size: 10px; font-weight: bold; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+        .w-btn.active { border-color: var(--neon) !important; background: rgba(0, 242, 254, 0.2) !important; box-shadow: 0 0 10px var(--neon); }
+        .btn-main { width: 100%; padding: 18px; border: none; border-radius: 15px; background: var(--pink); color: white; font-weight: 900; font-size: 1.1rem; cursor: pointer; }
+    </style>
+</head>
+<body>
+
+    <div id="reg-screen">
+        <h1 style="color: var(--neon); text-shadow: 0 0 15px var(--neon);">CRYPTO ARCHER</h1>
+        <input type="text" id="reg-input" placeholder="НИКНЕЙМ" maxlength="12" style="padding:15px; border-radius:12px; border:2px solid var(--neon); background:#000; color:#fff; margin-bottom:20px; text-align:center; width:260px;">
+        <button class="btn-main" style="width: 200px;" onclick="registerPlayer()">ВОЙТИ</button>
+    </div>
+
+    <div id="hub">
+        <div class="stats-bar">
+            <div style="color:var(--gold)">💰 <span id="gold-val">500</span></div>
+            <div style="color:var(--green)">🧪 <span id="chip-val">0</span></div>
+        </div>
+        <div class="menu-container">
+            <div class="section">
+                <div style="font-size: 0.7rem; color: #888;">ID: <span id="user-display" style="color:var(--neon)">-</span></div>
+                <h3 id="tower-title" style="color: var(--neon); margin: 5px 0;">БАШНЯ 1</h3>
+                <div id="tower-steps-list" class="tower-list"></div>
+                <button class="btn-main" onclick="goBattle()">В БОЙ</button>
+            </div>
+            <div id="up-list" class="section"></div>
+            <div class="section" style="border-color: #8a2be2;">
+                <div style="color: #8a2be2; font-size: 0.8rem; font-weight: bold;">PROCESSOR MINING</div>
+                <div class="mine-box"><div id="mine-fill"></div></div>
+                <button id="case-btn" class="up-btn" style="width: 100%; background: #8a2be2;" onclick="openCase()">КЕЙС (150🧪)</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="battle-top-ui">
+        <div class="battle-header">
+            <div style="color:var(--gold); font-weight:bold;">💰 <span id="b-gold">0</span></div>
+            <div style="color:#fff; font-size:11px; font-weight:900;">ЦЕЛЬ: <span id="b-enemy-name">-</span></div>
+            <div style="color:var(--neon); font-weight:bold;" id="b-status">ТВОЙ ХОД</div>
+        </div>
+    </div>
+
+    <div id="weaponDock">
+        <button class="w-btn active" id="wbtn-0" onclick="setWep(event, 0)">ЛУК<br><span style="font-size:8px; color:var(--gold)">∞</span></button>
+        <button class="w-btn" id="wbtn-1" onclick="setWep(event, 1)">ТОПОР<br><span id="ammo-1" style="font-size:8px; color:var(--gold)">0 (200💰)</span></button>
+        <button class="w-btn" id="wbtn-2" onclick="setWep(event, 2)">ЯДРО<br><span id="ammo-2" style="font-size:8px; color:var(--gold)">0 (500💰)</span></button>
+    </div>
+
+    <canvas id="gameCanvas"></canvas>
+
+    <script>
+        const canvas = document.getElementById('gameCanvas');
+        const ctx = canvas.getContext('2d', { alpha: false });
+        const imgAxe = new Image(); imgAxe.src = 'axe.png';
+        const imgBow = new Image(); imgBow.src = 'bow.png';
+        const imgGrass = new Image(); imgGrass.src = 'grassBlock.png';
+        const upIcons = { dmg: 'up_atk.png', hp: 'up_hp.png', loot: 'up_luck.png' };
+
+        let game = { user: "", gold: 500, chips: 0, tower: 0, stage: 0, mine: 0, ammo: [Infinity, 0, 0], curWep: 0, stats: { dmg: 1, hp: 1, loot: 1 } };
+        const ARSENAL = [
+            { n: "ЛУК", d: 25, g: 0.22, vis: 'arrow', cost: 0, pack: 0 },
+            { n: "ТОПОР", d: 65, g: 0.35, vis: 'axe', cost: 200, pack: 5 },
+            { n: "ЯДРО", d: 130, g: 0.55, vis: 'circle', cost: 500, pack: 3 }
+        ];
+
+        const TOWERS = [
+            { name: "Трущобы", baseCount: 3, bg: "#050505", g: 0.22 },
+            { name: "Неон-Сити", baseCount: 6, bg: "#050515", g: 0.30 },
+            { name: "Завод", baseCount: 12, bg: "#100a05", g: 0.22 },
+            { name: "Ядро", baseCount: 24, bg: "#150505", g: 0.15 },
+            { name: "Орбита", baseCount: 48, bg: "#000011", g: 0.10 },
+            { name: "Арена", baseCount: 96, bg: "#110011", g: 0.25 },
+            { name: "Облака", baseCount: 192, bg: "#0a1a1a", g: 0.20 },
+            { name: "Пустота", baseCount: 384, bg: "#000000", g: 0.22 },
+            { name: "Цитадель", baseCount: 768, bg: "#1a0a00", g: 0.35 },
+            { name: "Трон", baseCount: 1536, bg: "#0a0a0a", g: 0.22 }
+        ];
+
+        // ГЕНЕРАТОР ИМЕН ВРАГОВ
+        function generateEnemyName(tIdx, sIdx) {
+            const p = ["Cyber", "Neon", "Shadow", "Steel", "Dark", "Giga", "Void", "Iron", "Atomic", "Bio"];
+            const s = ["Hunter", "Bot", "Guard", "Warrior", "Slayer", "Droid", "Stalker", "Reaper", "Soldier", "Titan"];
+            return `${p[(tIdx + sIdx) % p.length]} ${s[(sIdx * 7) % s.length]} ${tIdx + 1}.${sIdx + 1}`;
+        }
+
+        let player, enemy, projectile = null, turn = 'p', isAiming = false, isWaiting = false, tStart = {x:0, y:0}, tCurr = {x:0, y:0}, obstacles = [];
+        let lastTime = 0;
+
+        function save() { localStorage.setItem('cryptoArcherFinalSaveSystem', JSON.stringify(game)); }
+        function registerPlayer() {
+            const n = document.getElementById('reg-input').value.trim();
+            if (n.length < 2) return;
+            game.user = n;
+            document.getElementById('reg-screen').style.display = 'none';
+            document.getElementById('hub').style.display = 'flex';
+            save(); updateHubUI();
+        }
+
+        function mainLoop(timestamp) {
+            const dt = timestamp - lastTime;
+            lastTime = timestamp;
+            game.mine += 0.005 * (dt || 16);
+            if (game.mine >= 100) { game.chips++; game.mine = 0; save(); }
+            if (document.getElementById('hub').style.display === 'flex') {
+                const el = document.getElementById('mine-fill'); if (el) el.style.width = game.mine + "%";
+                const cVal = document.getElementById('chip-val'); if (cVal) cVal.innerText = game.chips;
+            }
+            if (canvas.style.display === 'block') { updateBattle(); drawBattle(); }
+            requestAnimationFrame(mainLoop);
+        }
+
+        function updateHubUI() {
+            document.getElementById('gold-val').innerText = Math.floor(game.gold);
+            document.getElementById('user-display').innerText = game.user;
+            const t = TOWERS[game.tower] || TOWERS[0];
+            document.getElementById('tower-title').innerText = `БАШНЯ ${game.tower+1}: ${t.name.toUpperCase()}`;
+            
+            let listHtml = "";
+            for(let i=0; i < t.baseCount; i++) {
+                if(i < game.stage - 1 || i > game.stage + 2) continue;
+                listHtml += `<div style="padding:6px; border-radius:8px; font-size:11px; background:${i===game.stage?'var(--pink)':'#111'}">${generateEnemyName(game.tower, i)}</div>`;
+            }
+            document.getElementById('tower-steps-list').innerHTML = listHtml;
+
+            const configs = [{id:'dmg', n:'УРОН', i:'⚔️'}, {id:'hp', n:'ЖИЗНЬ', i:'❤️'}, {id:'loot', n:'УДАЧА', i:'💰'}];
+            document.getElementById('up-list').innerHTML = configs.map(s => {
+                let lvl = game.stats[s.id];
+                let cost = Math.floor(150 * Math.pow(2.6, lvl-1));
+                return `<div class="up-card">
+                    <div class="up-icon"><img src="${upIcons[s.id]}" onerror="this.style.display='none'; this.parentElement.innerText='${s.i}'"></div>
+                    <div style="flex:1; text-align:left; font-size:11px;"><b>${s.n}</b> (ур.${lvl})</div>
+                    <button class="up-btn" ${game.gold < cost ? 'disabled' : ''} onclick="buyStat('${s.id}', ${cost})">${cost}</button>
+                </div>`;
+            }).join('');
+        }
+
+        function buyStat(id, cost) { if(game.gold >= cost) { game.gold -= cost; game.stats[id]++; save(); updateHubUI(); } }
+        function openCase() { if(game.chips >= 150) { game.chips -= 150; game.stats.dmg += 0.5; save(); updateHubUI(); } }
+
+        function goBattle() {
+            canvas.style.display = 'block'; 
+            document.getElementById('hub').style.display = 'none';
+            document.getElementById('battle-top-ui').style.display = 'flex';
+            document.getElementById('weaponDock').style.display = 'flex';
+            canvas.width = window.innerWidth; canvas.height = window.innerHeight;
+            switchWep(0);
+            const t = TOWERS[game.tower] || TOWERS[0];
+            player = { x: canvas.width * 0.15, hp: 100 + (game.stats.hp-1)*40 };
+            let hpMult = Math.pow(1.6, game.tower) * (1 + game.stage * 0.25);
+            enemy = { x: canvas.width * 0.85, hp: Math.floor(100 * hpMult), dmg: 20 + (game.tower * 10), name: generateEnemyName(game.tower, game.stage) };
+            document.getElementById('b-enemy-name').innerText = enemy.name;
+            const bS = Math.floor(canvas.height / 15);
+            obstacles = [{ x: canvas.width/2 - (bS/2), y: canvas.height - 130 - (bS*3), w: bS, h: bS*3, bs: bS }];
+            projectile = null; turn = 'p'; isAiming = false; isWaiting = false;
+            updateAmmoUI();
+        }
+
+        function switchWep(idx) {
+            game.curWep = idx;
+            document.querySelectorAll('.w-btn').forEach((btn, i) => btn.classList.toggle('active', i === idx));
+        }
+
+        function setWep(e, idx) {
+            e.preventDefault(); e.stopPropagation();
+            const w = ARSENAL[idx];
+            if (idx > 0 && game.ammo[idx] <= 0) {
+                if (game.gold >= w.cost) { game.gold -= w.cost; game.ammo[idx] += w.pack; save(); updateHubUI(); } else return;
+            }
+            switchWep(idx); updateAmmoUI();
+        }
+
+        function updateAmmoUI() {
+            document.getElementById('ammo-1').innerText = `${game.ammo[1]} (200💰)`;
+            document.getElementById('ammo-2').innerText = `${game.ammo[2]} (500💰)`;
+        }
+
+        function updateBattle() {
+            if (projectile) {
+                projectile.x += projectile.vx; projectile.y += projectile.vy; projectile.vy += projectile.g;
+                let target = projectile.owner === 'p' ? enemy : player;
+                let hitT = Math.hypot(projectile.x - target.x, projectile.y - (canvas.height - 130 - 25)) < 35;
+                let hitO = obstacles.find(o => projectile.x > o.x && projectile.x < o.x + o.w && projectile.y > o.y && projectile.y < o.y + o.h);
+                if (hitT || hitO || projectile.y > canvas.height - 130 || projectile.x < 0 || projectile.x > canvas.width) {
+                    if (hitT) { target.hp -= projectile.dmg; if(projectile.owner==='p') game.gold += 50 * (1 + (game.stats.loot-1)*0.2); }
+                    projectile = null;
+                    if (target.hp <= 0) { 
+                        const t = TOWERS[game.tower] || TOWERS[0];
+                        game.stage++; if(game.stage >= t.baseCount){ game.tower++; game.stage = 0; }
+                        save(); exitBattle();
+                    } else { turn = (turn === 'p') ? 'e' : 'p'; if(turn === 'e') setTimeout(aiFire, 1000); else isWaiting = false; }
+                }
+            }
+        }
+
+        function drawBattle() {
+            const t = TOWERS[game.tower] || TOWERS[0];
+            ctx.fillStyle = t.bg || "#050505"; ctx.fillRect(0,0,canvas.width, canvas.height);
+            ctx.fillStyle = "#333"; ctx.fillRect(0, canvas.height - 130, canvas.width, 4);
+            obstacles.forEach(o => {
+                for (let i = 0; i < 3; i++) {
+                    let bY = o.y + (i * o.bs);
+                    if (imgGrass.complete && imgGrass.width > 0) ctx.drawImage(imgGrass, o.x, bY, o.w, o.bs);
+                    else { ctx.fillStyle = "#2d5a27"; ctx.fillRect(o.x, bY, o.w, o.bs); }
+                }
+            });
+            drawHuman(player.x, canvas.height - 130, '#00f2fe', 1, player.hp, isAiming);
+            drawHuman(enemy.x, canvas.height - 130, '#ff0055', 1.1, enemy.hp, false);
+            if (isAiming) {
+                ctx.beginPath(); ctx.strokeStyle = "rgba(255,255,255,0.3)";
+                const g = ARSENAL[game.curWep].g;
+                let tx = player.x, ty = canvas.height - 130 - 25, vx = (tStart.x - tCurr.x)*0.22, vy = (tStart.y - tCurr.y)*0.22;
+                for(let i=0; i<35; i++) { tx += vx; ty += vy; vy += g; ctx.lineTo(tx, ty); if(ty > canvas.height-130) break; }
+                ctx.stroke();
+            }
+            if (projectile) {
+                ctx.save(); ctx.translate(projectile.x, projectile.y);
+                if (projectile.vis === 'axe' && imgAxe.complete) { ctx.rotate(Date.now()*0.02); ctx.drawImage(imgAxe, -15, -15, 30, 30); }
+                else {
+                    ctx.rotate(Math.atan2(projectile.vy, projectile.vx) + Math.PI);
+                    ctx.fillStyle = projectile.vis === 'circle' ? '#f1c40f' : '#fff';
+                    if(projectile.vis === 'circle') { ctx.beginPath(); ctx.arc(0,0,8,0,Math.PI*2); ctx.fill(); }
+                    else ctx.fillRect(-12, -1, 24, 2);
+                }
+                ctx.restore();
+            }
+            document.getElementById('b-gold').innerText = Math.floor(game.gold);
+            document.getElementById('b-status').innerText = turn === 'p' ? "ВАШ ХОД" : "ВРАГ ЦЕЛИТСЯ";
+        }
+
+        function drawHuman(x, y, color, scale, hp, showBow) {
+            const s = (canvas.height / 850) * scale;
+            ctx.fillStyle = color;
+            ctx.fillRect(x - 10*s, y - 35*s, 20*s, 25*s);
+            ctx.beginPath(); ctx.arc(x, y - 45*s + Math.sin(Date.now()/200)*4, 10*s, 0, Math.PI*2); ctx.fill();
+            ctx.fillStyle = hp > 30 ? "#0f0" : "#f00"; ctx.font = `bold ${16*s}px Arial`; ctx.textAlign = "center";
+            ctx.fillText(Math.ceil(hp), x, y - 75*s);
+            if (showBow) {
+                ctx.save(); ctx.translate(x, y - 25*s);
+                ctx.rotate(Math.atan2(tStart.y - tCurr.y, tStart.x - tCurr.x) + Math.PI);
+                if (imgBow.complete && imgBow.width > 0) ctx.drawImage(imgBow, -30*s, -15*s, 30*s, 30*s);
+                else { ctx.strokeStyle="white"; ctx.lineWidth=3; ctx.beginPath(); ctx.arc(0,0,20*s,-1,1); ctx.stroke(); }
+                ctx.restore();
+            }
+        }
+
+        function aiFire() { 
+            const t = TOWERS[game.tower] || TOWERS[0];
+            projectile = { x: enemy.x, y: canvas.height-130-25, vx: (player.x-enemy.x)*0.08, vy: -12, g: t.g, owner: 'e', dmg: 20+(game.tower*10), vis: 'circle' }; 
+        }
+        
+        function exitBattle() { canvas.style.display='none'; document.getElementById('hub').style.display='flex'; document.getElementById('weaponDock').style.display='none'; document.getElementById('battle-top-ui').style.display='none'; updateHubUI(); }
+
+        canvas.addEventListener('touchstart', e => {
+            if (turn !== 'p' || isWaiting || canvas.style.display !== 'block') return;
+            const t = e.touches[0]; if (t.clientY < 180) return;
+            isAiming = true; tStart = { x: t.clientX, y: t.clientY }; tCurr = {...tStart};
+        }, { passive: false });
+
+        canvas.addEventListener('touchmove', e => {
+            if (!isAiming) return;
+            const t = e.touches[0]; tCurr = { x: t.clientX, y: t.clientY };
+            if (e.cancelable) e.preventDefault();
+        }, { passive: false });
+
+        canvas.addEventListener('touchend', () => {
+            if (!isAiming) return; isAiming = false;
+            let vx = (tStart.x - tCurr.x)*0.22, vy = (tStart.y - tCurr.y)*0.22;
+            if (Math.hypot(vx, vy) < 5 || (game.curWep > 0 && game.ammo[game.curWep] <= 0)) return;
+            isWaiting = true;
+            const w = ARSENAL[game.curWep], t = TOWERS[game.tower] || TOWERS[0];
+            projectile = { x: player.x, y: canvas.height - 130 - 25, vx, vy, g: w.g * (t.g / 0.22), owner: 'p', dmg: w.d + (game.stats.dmg-1)*12, vis: w.vis };
+            if (game.curWep > 0) game.ammo[game.curWep]--; updateAmmoUI();
+        });
+
+        const saved = localStorage.getItem('cryptoArcherFinalSaveSystem');
+        if (saved) { game = JSON.parse(saved); document.getElementById('reg-screen').style.display='none'; document.getElementById('hub').style.display='flex'; updateHubUI(); }
+        requestAnimationFrame(mainLoop);
+    </script>
+</body>
+</html>
