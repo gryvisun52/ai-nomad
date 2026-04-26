@@ -3,306 +3,413 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Crypto Archer: Names Restored</title>
+    <title>AI NOMAD: FINAL TOWER EDITION</title>
+    <link href="https://googleapis.com" rel="stylesheet">
     <style>
-        :root { --neon: #00f2fe; --pink: #ff0055; --gold: #f1c40f; --green: #00ff88; }
-        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; outline: none; }
-        body { margin: 0; overflow: hidden; background: #050505; font-family: 'Segoe UI', sans-serif; color: white; -webkit-user-select: none; touch-action: none; }
-        canvas { display: none; width: 100vw; height: 100vh; position: fixed; top: 0; left: 0; z-index: 5; will-change: transform; }
-        #reg-screen, #hub { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; z-index: 100; background: radial-gradient(circle at center, #1a1a2e 0%, #050505 100%); }
-        #hub { justify-content: flex-start; overflow-y: auto; padding: 20px 15px 140px; display: none; }
-        #reg-screen { justify-content: center; }
-        .stats-bar { width: 100%; max-width: 400px; display: flex; justify-content: space-around; background: rgba(0,0,0,0.85); padding: 12px; border-radius: 20px; border: 1px solid #333; margin-bottom: 15px; flex-shrink: 0; }
-        .menu-container { width: 100%; max-width: 450px; display: flex; flex-direction: column; gap: 10px; }
-        .section { background: rgba(255,255,255,0.05); border: 1px solid #444; padding: 15px; border-radius: 20px; text-align: center; }
-        .tower-list { display: flex; flex-direction: column-reverse; gap: 5px; margin-bottom: 12px; max-height: 120px; overflow-y: auto; padding: 5px; background: rgba(0,0,0,0.3); border-radius: 10px; border: 1px solid #222; }
-        .up-card { background: #111; border: 1px solid #333; padding: 10px; border-radius: 12px; margin-bottom: 8px; display: flex; align-items: center; gap: 12px; }
-        .up-icon { width: 42px; height: 42px; background: #222; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 20px; flex-shrink: 0; overflow: hidden; }
-        .up-icon img { width: 100%; height: 100%; object-fit: cover; }
-        .up-btn { background: #27ae60; border: none; color: white; padding: 10px; border-radius: 8px; font-weight: bold; min-width: 85px; cursor: pointer; }
-        .up-btn:disabled { background: #222 !important; color: #555 !important; cursor: default !important; opacity: 0.6; }
-        .mine-box { width: 100%; height: 10px; background: #000; border-radius: 5px; overflow: hidden; border: 1px solid #333; margin: 10px 0; }
-        #mine-fill { height: 100%; width: 0%; background: var(--green); box-shadow: 0 0 10px var(--green); }
-        #battle-top-ui { position: fixed; top: env(safe-area-inset-top, 10px); left: 0; width: 100%; display: none; z-index: 50; pointer-events: none; justify-content: center; }
-        .battle-header { width: 92%; background: rgba(0,0,0,0.85); padding: 10px 15px; border-radius: 15px; display: flex; justify-content: space-between; align-items: center; border: 1px solid #444; backdrop-filter: blur(5px); }
-        #weaponDock { position: fixed; top: calc(env(safe-area-inset-top, 10px) + 60px); left: 50%; transform: translateX(-50%); display: none; gap: 8px; z-index: 60; width: 95%; justify-content: center; pointer-events: auto; }
-        .w-btn { flex: 1; max-width: 110px; height: 50px; background: rgba(10,10,10,0.95); border: 2px solid #444; color: white; border-radius: 12px; font-size: 10px; font-weight: bold; display: flex; flex-direction: column; align-items: center; justify-content: center; }
-        .w-btn.active { border-color: var(--neon) !important; background: rgba(0, 242, 254, 0.2) !important; box-shadow: 0 0 10px var(--neon); }
-        .btn-main { width: 100%; padding: 18px; border: none; border-radius: 15px; background: var(--pink); color: white; font-weight: 900; font-size: 1.1rem; cursor: pointer; }
+        :root { --pink: #ff0055; --cyan: #00f2ff; --gold: #ffcc00; --bg: #050505; }
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; user-select: none; margin: 0; padding: 0; }
+        body, html { width: 100%; height: 100%; background: var(--bg); color: white; font-family: 'Orbitron', sans-serif; overflow: hidden; position: fixed; }
+
+        .screen { position: absolute; inset: 0; display: none; flex-direction: column; align-items: center; justify-content: flex-start; padding: 15px; padding-top: env(safe-area-inset-top, 20px); text-align: center; overflow-y: auto; z-index: 5; }
+        #reg-screen { display: flex; background: #000; z-index: 100; justify-content: center; }
+        #hub { background: radial-gradient(circle, #111 0%, #000 100%); }
+
+        input { background: #111; border: 1px solid var(--pink); color: white; padding: 12px; border-radius: 8px; text-align: center; margin: 10px; width: 80%; max-width: 300px; font-family: 'Orbitron'; }
+        button { background: var(--pink); border: none; color: white; padding: 8px; border-radius: 8px; font-weight: bold; cursor: pointer; text-transform: uppercase; font-family: 'Orbitron'; font-size: 9px; transition: 0.2s; }
+        button:active { transform: scale(0.95); }
+        button:disabled { opacity: 0.3; filter: grayscale(1); }
+        
+        .panel { background: rgba(20,20,20,0.95); padding: 10px; border-radius: 12px; border: 1px solid #333; width: 100%; max-width: 450px; margin-bottom: 8px; }
+        .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
+        .card { background: #111; padding: 8px; border-radius: 8px; border: 1px solid #333; font-size: 8px; display: flex; flex-direction: column; gap: 4px; }
+        
+        .mine-box { width: 100%; background: #000; border-radius: 10px; padding: 10px; border: 1px solid #222; }
+        .bar-bg { background: #111; height: 12px; border-radius: 6px; overflow: hidden; margin: 5px 0; }
+        #mine-fill { height: 100%; background: var(--cyan); width: 0%; box-shadow: 0 0 10px var(--cyan); }
+
+        .skin-select { display: flex; gap: 8px; justify-content: center; margin-top: 5px; flex-wrap: wrap; }
+        .skin-btn { width: 65px; height: 75px; border: 2px solid #333; border-radius: 8px; background-size: 30px; background-repeat: no-repeat; background-position: center 10px; cursor: pointer; background-color: #111; font-size: 7px; display: flex; align-items: flex-end; justify-content: center; padding-bottom: 5px; }
+        .skin-btn.active { border-color: var(--cyan); box-shadow: 0 0 10px var(--cyan); }
+        .skin-btn.leg-s { border-color: var(--gold); }
+        .skin-btn.owned::after { content: '✅'; position: absolute; top: -5px; right: -5px; font-size: 10px; }
+
+        #gameCanvas { display: none; width: 100%; height: 100%; touch-action: none; position: fixed; z-index: 1; }
+        #battle-ui { position: absolute; inset: 0; pointer-events: none; z-index: 10; display: none; }
+        #battle-top { position: absolute; top: env(safe-area-inset-top, 15px); width: 100%; display: flex; justify-content: space-around; align-items: center; }
+        .hp-cont { width: 30vw; height: 10px; background: #222; border-radius: 5px; border: 1px solid #444; overflow: hidden; }
+        .hp-fill { height: 100%; background: var(--cyan); width: 100%; transition: width 0.3s; }
+        
+        #weaponDock { position: absolute; bottom: calc(20px + env(safe-area-inset-bottom, 0px)); left: 50%; transform: translateX(-50%); display: flex; gap: 8px; pointer-events: auto; }
+        .w-btn { width: 60px; height: 65px; background: rgba(0,0,0,0.8); border: 2px solid #333; border-radius: 12px; display: flex; flex-direction: column; align-items: center; justify-content: center; cursor: pointer; font-size: 18px; position: relative; }
+        .w-btn.active { border-color: var(--cyan); box-shadow: 0 0 10px var(--cyan); }
+        .w-btn.leg { border-color: var(--gold); box-shadow: 0 0 10px var(--gold); }
+        .w-cost { font-size: 7px; color: #888; font-style: normal; margin-top: 2px; font-family: 'Orbitron'; }
+        #roulette-result { font-size: 10px; color: var(--gold); margin-top: 5px; height: 12px; font-weight: bold; }
     </style>
 </head>
 <body>
 
-    <div id="reg-screen">
-        <h1 style="color: var(--neon); text-shadow: 0 0 15px var(--neon);">CRYPTO ARCHER</h1>
-        <input type="text" id="reg-input" placeholder="НИКНЕЙМ" maxlength="12" style="padding:15px; border-radius:12px; border:2px solid var(--neon); background:#000; color:#fff; margin-bottom:20px; text-align:center; width:260px;">
-        <button class="btn-main" style="width: 200px;" onclick="registerPlayer()">ВОЙТИ</button>
+    <div id="reg-screen" class="screen">
+        <h2 style="color:var(--pink)">AI NOMAD</h2>
+        <input type="text" id="reg-input" placeholder="НИКНЕЙМ" maxlength="10">
+        <button onclick="register()">ВОЙТИ В СЕТЬ</button>
     </div>
 
-    <div id="hub">
-        <div class="stats-bar">
-            <div style="color:var(--gold)">💰 <span id="gold-val">500</span></div>
-            <div style="color:var(--green)">🧪 <span id="chip-val">0</span></div>
-        </div>
-        <div class="menu-container">
-            <div class="section">
-                <div style="font-size: 0.7rem; color: #888;">ID: <span id="user-display" style="color:var(--neon)">-</span></div>
-                <h3 id="tower-title" style="color: var(--neon); margin: 5px 0;">БАШНЯ 1</h3>
-                <div id="tower-steps-list" class="tower-list"></div>
-                <button class="btn-main" onclick="goBattle()">В БОЙ</button>
+    <div id="hub" class="screen">
+        <h3 id="user-tag" style="color:var(--cyan); margin: 5px 0;">PILOT</h3>
+        <p id="tower-title" style="color:var(--pink); font-size: 10px; margin-bottom: 5px;">БАШНЯ 1</p>
+        
+        <div class="panel">
+            <div style="display:flex; justify-content: space-around; font-size: 14px;">
+                <span style="color:gold">💰 <span id="gold-val">0</span></span>
+                <span style="color:var(--cyan)">💎 <span id="chip-val">0</span></span>
             </div>
-            <div id="up-list" class="section"></div>
-            <div class="section" style="border-color: #8a2be2;">
-                <div style="color: #8a2be2; font-size: 0.8rem; font-weight: bold;">PROCESSOR MINING</div>
-                <div class="mine-box"><div id="mine-fill"></div></div>
-                <button id="case-btn" class="up-btn" style="width: 100%; background: #8a2be2;" onclick="openCase()">КЕЙС (150🧪)</button>
+            <button onclick="goBattle()" style="width:100%; margin-top:8px; padding: 12px; background:var(--cyan); color:#000; font-size: 12px;">В БОЙ</button>
+        </div>
+
+        <div class="panel" style="border-color: var(--gold);">
+            <p style="font-size: 9px; color: var(--gold);">КВАНТОВАЯ РУЛЕТКА</p>
+            <div id="roulette-result">ЖМИТЕ SPIN!</div>
+            <button onclick="spinRoulette()" id="spin-btn" style="width:100%; margin-top:5px; background: linear-gradient(45deg, #444, #222); border: 1px solid var(--gold);">SPIN (5000💰)</button>
+        </div>
+
+        <div class="panel">
+            <p style="font-size: 9px; color: var(--pink); margin-bottom: 5px;">ЭКИПИРОВКА</p>
+            <div class="skin-select">
+                <div class="skin-btn active owned" id="s0" onclick="buySkin(0, 0)" style="background-image: url('https://img.icons8.com/?size=100&id=59023&format=png&color=000000')">FREE</div>
+                <div class="skin-btn" id="s1" onclick="buySkin(1, 3000)" style="background-image: url('https://img.icons8.com/?size=100&id=sQ8d3BxweuhA&format=png&color=000000')">3000💰</div>
+                <div class="skin-btn" id="s2" onclick="buySkin(2, 250000)" style="background-image: url('https://img.icons8.com/?size=100&id=78459&format=png&color=000000')">250000💰</div>
+                <div class="skin-btn leg-s" id="s3" onclick="buySkin(3, 5000, true)" style="background-image: url('https://img.icons8.com/?size=100&id=78253&format=png&color=000000')">5000💎</div>
+            </div>
+        </div>
+
+        <div class="panel">
+            <div class="mine-box">
+                <div style="font-size:9px; display:flex; justify-content:space-between;"><span>ГЕНЕРАТОР ЩИТОВ</span><span id="mine-perc">0%</span></div>
+                <div class="bar-bg"><div id="mine-fill"></div></div>
+                <button onclick="buyStat('shield_chip')" id="btn_chip" style="width:100%; font-size:8px;">ОБМЕН 150💎 НА +2 УР. ЖИЗНИ</button>
+            </div>
+        </div>
+
+        <div class="panel">
+            <div class="grid">
+                <div class="card"><b>⚔️ УРОН</b>Ур.<span id="lvl_dmg">1</span><button onclick="buyStat('dmg')" id="btn_up_dmg">0</button></div>
+                <div class="card"><b>❤️ ЖИЗНЬ</b>Ур.<span id="lvl_hp">1</span><button onclick="buyStat('hp')" id="btn_up_hp">0</button></div>
+                <div class="card"><b>💰 УДАЧА</b>Ур.<span id="lvl_loot">1</span><button onclick="buyStat('loot')" id="btn_up_loot">0</button></div>
+                <div class="card"><b>⚡ ПЛАЗМА</b>LEG Лук<button onclick="buyLeg('leg_1', 500)" id="btn_leg_1">500💎</button></div>
+                <div class="card"><b>🔨 МОЛОТ</b>LEG Топор<button onclick="buyLeg('leg_2', 1000)" id="btn_leg_2">1000💎</button></div>
+                <div class="card"><b>🕳️ ДЫРА</b>LEG Ядро<button onclick="buyLeg('leg_3', 2500)" id="btn_leg_3">2500💎</button></div>
             </div>
         </div>
     </div>
 
-    <div id="battle-top-ui">
-        <div class="battle-header">
-            <div style="color:var(--gold); font-weight:bold;">💰 <span id="b-gold">0</span></div>
-            <div style="color:#fff; font-size:11px; font-weight:900;">ЦЕЛЬ: <span id="b-enemy-name">-</span></div>
-            <div style="color:var(--neon); font-weight:bold;" id="b-status">ТВОЙ ХОД</div>
+    <div id="battle-ui">
+        <div id="battle-top">
+            <div class="hp-cont"><div id="hp-p" class="hp-fill"></div></div>
+            <div id="b-gold" style="color:gold; font-size:12px; font-weight:bold;">💰 0</div>
+            <div class="hp-cont"><div id="hp-e" class="hp-fill" style="background:var(--pink)"></div></div>
+        </div>
+        <div id="weaponDock">
+            <div class="w-btn active" id="slot0" onclick="switchWep(0)">🏹<i class="w-cost">FREE</i></div>
+            <div class="w-btn" id="slot1" onclick="switchWep(1)">🪓<i class="w-cost">10💰</i></div>
+            <div class="w-btn" id="slot2" onclick="switchWep(2)">💣<i class="w-cost">50💰</i></div>
         </div>
     </div>
-
-    <div id="weaponDock">
-        <button class="w-btn active" id="wbtn-0" onclick="setWep(event, 0)">ЛУК<br><span style="font-size:8px; color:var(--gold)">∞</span></button>
-        <button class="w-btn" id="wbtn-1" onclick="setWep(event, 1)">ТОПОР<br><span id="ammo-1" style="font-size:8px; color:var(--gold)">0 (200💰)</span></button>
-        <button class="w-btn" id="wbtn-2" onclick="setWep(event, 2)">ЯДРО<br><span id="ammo-2" style="font-size:8px; color:var(--gold)">0 (500💰)</span></button>
-    </div>
-
+    
     <canvas id="gameCanvas"></canvas>
 
     <script>
         const canvas = document.getElementById('gameCanvas');
         const ctx = canvas.getContext('2d', { alpha: false });
-        const imgAxe = new Image(); imgAxe.src = 'axe.png';
-        const imgBow = new Image(); imgBow.src = 'bow.png';
-        const imgGrass = new Image(); imgGrass.src = 'grassBlock.png';
-        const upIcons = { dmg: 'up_atk.png', hp: 'up_hp.png', loot: 'up_luck.png' };
 
-        let game = { user: "", gold: 500, chips: 0, tower: 0, stage: 0, mine: 0, ammo: [Infinity, 0, 0], curWep: 0, stats: { dmg: 1, hp: 1, loot: 1 } };
-        const ARSENAL = [
-            { n: "ЛУК", d: 25, g: 0.22, vis: 'arrow', cost: 0, pack: 0 },
-            { n: "ТОПОР", d: 65, g: 0.35, vis: 'axe', cost: 200, pack: 5 },
-            { n: "ЯДРО", d: 130, g: 0.55, vis: 'circle', cost: 500, pack: 3 }
+        const skinUrls = [
+            'https://img.icons8.com/?size=100&id=59023&format=png&color=000000',
+            'https://img.icons8.com/?size=100&id=sQ8d3BxweuhA&format=png&color=000000',
+            'https://img.icons8.com/?size=100&id=78459&format=png&color=000000',
+            'https://img.icons8.com/?size=100&id=78253&format=png&color=000000'
         ];
+        const imgP = new Image();
+        const imgE = new Image(); imgE.src = 'https://img.icons8.com/?size=100&id=BjByu959rSNb&format=png&color=000000';
+
+        let game = { 
+            user: "", gold: 100, chips: 0, mine: 0, tower: 0, stage: 0, 
+            curWep: 0, skinIdx: 0, ownedSkins: [0], ownedWeps: ['w0', 'w1', 'w2'],
+            stats: { dmg: 1, hp: 1, loot: 1 }
+        };
 
         const TOWERS = [
-            { name: "Трущобы", baseCount: 3, bg: "#050505", g: 0.22 },
-            { name: "Неон-Сити", baseCount: 6, bg: "#050515", g: 0.30 },
-            { name: "Завод", baseCount: 12, bg: "#100a05", g: 0.22 },
-            { name: "Ядро", baseCount: 24, bg: "#150505", g: 0.15 },
-            { name: "Орбита", baseCount: 48, bg: "#000011", g: 0.10 },
-            { name: "Арена", baseCount: 96, bg: "#110011", g: 0.25 },
-            { name: "Облака", baseCount: 192, bg: "#0a1a1a", g: 0.20 },
-            { name: "Пустота", baseCount: 384, bg: "#000000", g: 0.22 },
-            { name: "Цитадель", baseCount: 768, bg: "#1a0a00", g: 0.35 },
-            { name: "Трон", baseCount: 1536, bg: "#0a0a0a", g: 0.22 }
+            { name: "Трущобы", stages: 5, g: 0.18, bg: "#050202", diff: 1.0 },
+            { name: "Неон-Сити", stages: 8, g: 0.22, bg: "#020210", diff: 1.5 },
+            { name: "Завод", stages: 10, g: 0.25, bg: "#0a0805", diff: 2.2 },
+            { name: "Био-Зона", stages: 12, g: 0.28, bg: "#051005", diff: 3.0 },
+            { name: "Облака", stages: 15, g: 0.15, bg: "#050a10", diff: 4.5 },
+            { name: "Кристаллы", stages: 15, g: 0.35, bg: "#0a0015", diff: 6.0 },
+            { name: "Орбита", stages: 20, g: 0.12, bg: "#000000", diff: 8.5 },
+            { name: "Пустота", stages: 25, g: 0.22, bg: "#020002", diff: 12.0 },
+            { name: "Цитадель", stages: 30, g: 0.40, bg: "#150505", diff: 20.0 },
+            { name: "Ядро", stages: 50, g: 0.25, bg: "#00050a", diff: 40.0 }
+        ];
+        
+        const ARSENAL = [
+            { type: "arrow", d: 25, f: 0.4, p: 0, leg: false },
+            { type: "axe", d: 65, f: 0.45, p: 10, leg: false },
+            { type: "bomb", d: 120, f: 0.5, p: 50, leg: false },
+            { type: "arrow", d: 85, f: 0.6, p: 0, leg: true },
+            { type: "axe", d: 220, f: 0.5, p: 10, leg: true },
+            { type: "bomb", d: 500, f: 0.6, p: 50, leg: true }
         ];
 
-        // ГЕНЕРАТОР ИМЕН ВРАГОВ
-        function generateEnemyName(tIdx, sIdx) {
-            const p = ["Cyber", "Neon", "Shadow", "Steel", "Dark", "Giga", "Void", "Iron", "Atomic", "Bio"];
-            const s = ["Hunter", "Bot", "Guard", "Warrior", "Slayer", "Droid", "Stalker", "Reaper", "Soldier", "Titan"];
-            return `${p[(tIdx + sIdx) % p.length]} ${s[(sIdx * 7) % s.length]} ${tIdx + 1}.${sIdx + 1}`;
-        }
+        let player, enemy, wall, projectiles = [], turn = 'p', isAiming = false, tStart = {x:0, y:0}, tCurr = {x:0, y:0};
+        let particles = [], explosions = [], lastTime = 0;
 
-        let player, enemy, projectile = null, turn = 'p', isAiming = false, isWaiting = false, tStart = {x:0, y:0}, tCurr = {x:0, y:0}, obstacles = [];
-        let lastTime = 0;
+        function save() { localStorage.setItem('nomad_v_ultimate_final', JSON.stringify(game)); }
 
-        function save() { localStorage.setItem('cryptoArcherFinalSaveSystem', JSON.stringify(game)); }
-        function registerPlayer() {
-            const n = document.getElementById('reg-input').value.trim();
-            if (n.length < 2) return;
-            game.user = n;
+        function register() {
+            let val = document.getElementById('reg-input').value.trim();
+            if(val.length < 2) return;
+            game.user = val;
             document.getElementById('reg-screen').style.display = 'none';
             document.getElementById('hub').style.display = 'flex';
+            setSkin(game.skinIdx); save(); updateHubUI();
+        }
+
+        function spinRoulette() {
+            if(game.gold < 5000) return;
+            game.gold -= 5000;
+            const resEl = document.getElementById('roulette-result');
+            const rand = Math.random();
+            if(rand < 0.5) {
+                const win = Math.floor(Math.random() * 8000) + 1000;
+                game.gold += win; resEl.innerText = `ВЫИГРЫШ: ${win}💰`; resEl.style.color = "gold";
+            } else if(rand < 0.85) {
+                resEl.innerText = "ПУСТО..."; resEl.style.color = "#888";
+            } else {
+                game.chips += 5; resEl.innerText = "ДЖЕКПОТ: 5💎"; resEl.style.color = "cyan";
+            }
             save(); updateHubUI();
         }
 
-        function mainLoop(timestamp) {
-            const dt = timestamp - lastTime;
-            lastTime = timestamp;
-            game.mine += 0.005 * (dt || 16);
-            if (game.mine >= 100) { game.chips++; game.mine = 0; save(); }
-            if (document.getElementById('hub').style.display === 'flex') {
-                const el = document.getElementById('mine-fill'); if (el) el.style.width = game.mine + "%";
-                const cVal = document.getElementById('chip-val'); if (cVal) cVal.innerText = game.chips;
+        function buySkin(idx, price, isCrystal = false) {
+            if (game.ownedSkins.includes(idx)) { setSkin(idx); } else {
+                if (isCrystal) { if (game.chips >= price) { game.chips -= price; game.ownedSkins.push(idx); setSkin(idx); } } 
+                else { if (game.gold >= price) { game.gold -= price; game.ownedSkins.push(idx); setSkin(idx); } }
             }
-            if (canvas.style.display === 'block') { updateBattle(); drawBattle(); }
-            requestAnimationFrame(mainLoop);
+            save(); updateHubUI();
+        }
+
+        function setSkin(idx) {
+            game.skinIdx = idx;
+            imgP.src = skinUrls[idx];
+            document.querySelectorAll('.skin-select .skin-btn').forEach((b, i) => {
+                b.classList.toggle('active', i === idx);
+                if (game.ownedSkins.includes(i)) b.classList.add('owned');
+            });
+        }
+
+        function buyStat(type) {
+            if (type === 'shield_chip' && game.chips >= 150) { game.chips -= 150; game.stats.hp += 2; } 
+            else {
+                let cost = Math.floor(100 * Math.pow(1.8, game.stats[type]-1));
+                if (game.gold >= cost) { game.gold -= cost; game.stats[type]++; }
+            }
+            save(); updateHubUI();
+        }
+
+        function buyLeg(id, price) {
+            if (game.chips >= price && !game.ownedWeps.includes(id)) { game.chips -= price; game.ownedWeps.push(id); save(); updateHubUI(); }
         }
 
         function updateHubUI() {
             document.getElementById('gold-val').innerText = Math.floor(game.gold);
-            document.getElementById('user-display').innerText = game.user;
-            const t = TOWERS[game.tower] || TOWERS[0];
-            document.getElementById('tower-title').innerText = `БАШНЯ ${game.tower+1}: ${t.name.toUpperCase()}`;
-            
-            let listHtml = "";
-            for(let i=0; i < t.baseCount; i++) {
-                if(i < game.stage - 1 || i > game.stage + 2) continue;
-                listHtml += `<div style="padding:6px; border-radius:8px; font-size:11px; background:${i===game.stage?'var(--pink)':'#111'}">${generateEnemyName(game.tower, i)}</div>`;
+            document.getElementById('chip-val').innerText = game.chips;
+            document.getElementById('user-tag').innerText = game.user || "PILOT";
+            let t = TOWERS[game.tower] || TOWERS[TOWERS.length-1];
+            document.getElementById('tower-title').innerText = `БАШНЯ ${game.tower+1}: ${t.name.toUpperCase()} (${game.stage+1}/${t.stages})`;
+            ['dmg', 'hp', 'loot'].forEach(id => {
+                let cost = Math.floor(100 * Math.pow(1.8, game.stats[id]-1));
+                document.getElementById('lvl_'+id).innerText = game.stats[id];
+                document.getElementById('btn_up_'+id).innerText = cost + "💰";
+                document.getElementById('btn_up_'+id).disabled = game.gold < cost;
+            });
+            for(let i=1; i<=3; i++) {
+                if(game.ownedWeps.includes('leg_'+i)) {
+                    document.getElementById('btn_leg_'+i).innerText = "OK";
+                    document.getElementById('btn_leg_'+i).disabled = true;
+                    document.getElementById('slot'+(i-1)).classList.add('leg');
+                }
             }
-            document.getElementById('tower-steps-list').innerHTML = listHtml;
-
-            const configs = [{id:'dmg', n:'УРОН', i:'⚔️'}, {id:'hp', n:'ЖИЗНЬ', i:'❤️'}, {id:'loot', n:'УДАЧА', i:'💰'}];
-            document.getElementById('up-list').innerHTML = configs.map(s => {
-                let lvl = game.stats[s.id];
-                let cost = Math.floor(150 * Math.pow(2.6, lvl-1));
-                return `<div class="up-card">
-                    <div class="up-icon"><img src="${upIcons[s.id]}" onerror="this.style.display='none'; this.parentElement.innerText='${s.i}'"></div>
-                    <div style="flex:1; text-align:left; font-size:11px;"><b>${s.n}</b> (ур.${lvl})</div>
-                    <button class="up-btn" ${game.gold < cost ? 'disabled' : ''} onclick="buyStat('${s.id}', ${cost})">${cost}</button>
-                </div>`;
-            }).join('');
+            document.getElementById('spin-btn').disabled = game.gold < 5000;
         }
-
-        function buyStat(id, cost) { if(game.gold >= cost) { game.gold -= cost; game.stats[id]++; save(); updateHubUI(); } }
-        function openCase() { if(game.chips >= 150) { game.chips -= 150; game.stats.dmg += 0.5; save(); updateHubUI(); } }
 
         function goBattle() {
-            canvas.style.display = 'block'; 
-            document.getElementById('hub').style.display = 'none';
-            document.getElementById('battle-top-ui').style.display = 'flex';
-            document.getElementById('weaponDock').style.display = 'flex';
-            canvas.width = window.innerWidth; canvas.height = window.innerHeight;
-            switchWep(0);
-            const t = TOWERS[game.tower] || TOWERS[0];
-            player = { x: canvas.width * 0.15, hp: 100 + (game.stats.hp-1)*40 };
-            let hpMult = Math.pow(1.6, game.tower) * (1 + game.stage * 0.25);
-            enemy = { x: canvas.width * 0.85, hp: Math.floor(100 * hpMult), dmg: 20 + (game.tower * 10), name: generateEnemyName(game.tower, game.stage) };
-            document.getElementById('b-enemy-name').innerText = enemy.name;
-            const bS = Math.floor(canvas.height / 15);
-            obstacles = [{ x: canvas.width/2 - (bS/2), y: canvas.height - 130 - (bS*3), w: bS, h: bS*3, bs: bS }];
-            projectile = null; turn = 'p'; isAiming = false; isWaiting = false;
-            updateAmmoUI();
+            canvas.style.display = 'block'; document.getElementById('hub').style.display = 'none';
+            document.getElementById('battle-ui').style.display = 'block';
+            resize();
+            let pMaxHP = 150 + (game.stats.hp-1)*50;
+            player = { x: canvas.width * 0.15, hp: pMaxHP, maxHP: pMaxHP };
+            let t = TOWERS[game.tower] || TOWERS[TOWERS.length-1];
+            let eHP = Math.floor((100 + (game.tower * 150) + (game.stage * 40)) * t.diff);
+            enemy = { x: canvas.width * 0.85, hp: eHP, maxHP: eHP };
+            let h = canvas.height * 0.2 + Math.random() * (canvas.height * 0.2);
+            wall = { x: canvas.width * 0.45, y: canvas.height - 130 - h, w: 35, h: h };
+            projectiles = []; turn = 'p'; updateBattleUI();
         }
 
-        function switchWep(idx) {
-            game.curWep = idx;
-            document.querySelectorAll('.w-btn').forEach((btn, i) => btn.classList.toggle('active', i === idx));
+        function updateBattleUI() {
+            document.getElementById('hp-p').style.width = (player.hp/player.maxHP*100) + "%";
+            document.getElementById('hp-e').style.width = (enemy.hp/enemy.maxHP*100) + "%";
+            document.getElementById('b-gold').innerText = "💰 " + Math.floor(game.gold);
         }
 
-        function setWep(e, idx) {
-            e.preventDefault(); e.stopPropagation();
-            const w = ARSENAL[idx];
-            if (idx > 0 && game.ammo[idx] <= 0) {
-                if (game.gold >= w.cost) { game.gold -= w.cost; game.ammo[idx] += w.pack; save(); updateHubUI(); } else return;
+        function switchWep(idx) { game.curWep = idx; document.querySelectorAll('.w-btn').forEach((b, i) => b.classList.toggle('active', i === idx)); }
+
+        function drawEntity(img, x, y, isEnemy) {
+            if (!img.complete || img.naturalWidth === 0) return;
+            ctx.save(); ctx.translate(x, y-155); if(isEnemy) ctx.scale(-1, 1);
+            ctx.drawImage(img, -20, -20, 40, 40); ctx.restore();
+        }
+
+        function drawProjectile(p) {
+            ctx.save(); ctx.translate(p.x, p.y);
+            if(p.type === "axe") { ctx.rotate(Date.now()*0.02); ctx.font = "24px serif"; ctx.fillText("🪓", -12, 10); }
+            else { 
+                ctx.rotate(Math.atan2(p.vy, p.vx)); ctx.fillStyle = p.leg ? "gold" : "white";
+                if(p.type === "arrow") { ctx.fillRect(-15,-1.5,30,3); ctx.beginPath(); ctx.moveTo(15,0); ctx.lineTo(10,-5); ctx.lineTo(10,5); ctx.fill(); }
+                else { ctx.beginPath(); ctx.arc(0,0,10,0,7); ctx.fill(); }
             }
-            switchWep(idx); updateAmmoUI();
+            ctx.restore();
         }
 
-        function updateAmmoUI() {
-            document.getElementById('ammo-1').innerText = `${game.ammo[1]} (200💰)`;
-            document.getElementById('ammo-2').innerText = `${game.ammo[2]} (500💰)`;
-        }
-
-        function updateBattle() {
-            if (projectile) {
-                projectile.x += projectile.vx; projectile.y += projectile.vy; projectile.vy += projectile.g;
-                let target = projectile.owner === 'p' ? enemy : player;
-                let hitT = Math.hypot(projectile.x - target.x, projectile.y - (canvas.height - 130 - 25)) < 35;
-                let hitO = obstacles.find(o => projectile.x > o.x && projectile.x < o.x + o.w && projectile.y > o.y && projectile.y < o.y + o.h);
-                if (hitT || hitO || projectile.y > canvas.height - 130 || projectile.x < 0 || projectile.x > canvas.width) {
-                    if (hitT) { target.hp -= projectile.dmg; if(projectile.owner==='p') game.gold += 50 * (1 + (game.stats.loot-1)*0.2); }
-                    projectile = null;
-                    if (target.hp <= 0) { 
-                        const t = TOWERS[game.tower] || TOWERS[0];
-                        game.stage++; if(game.stage >= t.baseCount){ game.tower++; game.stage = 0; }
-                        save(); exitBattle();
-                    } else { turn = (turn === 'p') ? 'e' : 'p'; if(turn === 'e') setTimeout(aiFire, 1000); else isWaiting = false; }
+        function update() {
+            let t = TOWERS[game.tower] || TOWERS[TOWERS.length-1];
+            for (let i = projectiles.length - 1; i >= 0; i--) {
+                let p = projectiles[i]; p.x += p.vx; p.y += p.vy; p.vy += t.g;
+                if (Math.random() > 0.4) particles.push({x: p.x, y: p.y, life: 1, c: p.leg || game.skinIdx === 3 ? 'gold' : 'white'});
+                let target = p.owner === 'p' ? enemy : player;
+                let hitT = Math.hypot(p.x - target.x, p.y - (canvas.height - 155)) < 35;
+                let hitW = (p.x > wall.x && p.x < wall.x + wall.w && p.y > wall.y);
+                if (hitT || hitW || p.y > canvas.height - 130) {
+                    if (hitT) target.hp -= p.dmg;
+                    if (p.type === "bomb") explosions.push({x: p.x, y: p.y, r: 0, maxR: 150, a: 1});
+                    projectiles.splice(i, 1); updateBattleUI();
+                    if (enemy.hp <= 0 || player.hp <= 0) {
+                        if(enemy.hp <= 0) { 
+                            game.gold += 300 * game.stats.loot * t.diff; 
+                            game.stage++; 
+                            if(game.stage >= t.stages){ game.tower++; game.stage = 0; }
+                        }
+                        save(); setTimeout(exitBattle, 1000);
+                    } else if (projectiles.length === 0) { turn = (turn === 'p') ? 'e' : 'p'; if (turn === 'e') setTimeout(enemyTurn, 1000); }
                 }
             }
         }
 
-        function drawBattle() {
-            const t = TOWERS[game.tower] || TOWERS[0];
-            ctx.fillStyle = t.bg || "#050505"; ctx.fillRect(0,0,canvas.width, canvas.height);
-            ctx.fillStyle = "#333"; ctx.fillRect(0, canvas.height - 130, canvas.width, 4);
-            obstacles.forEach(o => {
-                for (let i = 0; i < 3; i++) {
-                    let bY = o.y + (i * o.bs);
-                    if (imgGrass.complete && imgGrass.width > 0) ctx.drawImage(imgGrass, o.x, bY, o.w, o.bs);
-                    else { ctx.fillStyle = "#2d5a27"; ctx.fillRect(o.x, bY, o.w, o.bs); }
-                }
-            });
-            drawHuman(player.x, canvas.height - 130, '#00f2fe', 1, player.hp, isAiming);
-            drawHuman(enemy.x, canvas.height - 130, '#ff0055', 1.1, enemy.hp, false);
-            if (isAiming) {
-                ctx.beginPath(); ctx.strokeStyle = "rgba(255,255,255,0.3)";
-                const g = ARSENAL[game.curWep].g;
-                let tx = player.x, ty = canvas.height - 130 - 25, vx = (tStart.x - tCurr.x)*0.22, vy = (tStart.y - tCurr.y)*0.22;
-                for(let i=0; i<35; i++) { tx += vx; ty += vy; vy += g; ctx.lineTo(tx, ty); if(ty > canvas.height-130) break; }
+        function enemyTurn() {
+    const t = TOWERS[game.tower] || TOWERS[TOWERS.length - 1];
+    const g = t.g;
+    
+    // Точные координаты (учитываем высоту персонажей)
+    const targetX = player.x;
+    const targetY = canvas.height - 170;
+    const startX = enemy.x;
+    const startY = canvas.height - 170;
+    
+    const dist = startX - targetX;
+    
+    // 1. ВЫБОР УГЛА СТРЕЛЬБЫ
+    // Чтобы гарантированно перебросить стену, боту нужен крутой угол (60-70 градусов)
+    // Угол в радианах (65 градусов для навеса)
+    const angleRad = 65 * Math.PI / 180;
+
+    // 2. ФОРМУЛА БАЛЛИСТИКИ ДЛЯ ПОПАДАНИЯ В ТОЧКУ
+    // v = sqrt( (g * x^2) / (2 * x * sin(a) * cos(a) - 2 * y * cos^2(a)) )
+    // В нашем случае y (разница высот) почти 0, упрощаем:
+    let velocity = Math.sqrt((dist * g) / Math.sin(2 * angleRad));
+
+    // 3. ПРОВЕРКА ПЕРЕЛЕТА ЧЕРЕЗ СТЕНУ
+    // Рассчитываем высоту полета в точке стены
+    const wallDist = startX - (wall.x + wall.w/2);
+    const timeToWall = wallDist / (velocity * Math.cos(angleRad));
+    const heightAtWall = startY - (velocity * Math.sin(angleRad) * timeToWall - 0.5 * g * timeToWall * timeToWall);
+    
+    // Если снаряд ниже стены, увеличиваем силу, пока не перелетит
+    if (heightAtWall > wall.y) {
+        velocity *= 1.2; 
+    }
+
+    // 4. ТОЧНОСТЬ (РАЗБРОС)
+    // На 1 башне ИИ мажет. На 10-й башне (game.tower = 9) погрешность стремится к 0.
+    const skill = Math.min(game.tower / 9, 1); // 0 (нуб) до 1 (профи)
+    const errorRange = 0.15 * (1 - skill); 
+    const randomFactor = 1 + (Math.random() * errorRange * 2 - errorRange);
+    const finalVel = velocity * randomFactor;
+
+    // 5. ВЫБОР ТИПА ОРУЖИЯ
+    let type = (Math.random() < 0.3) ? "bomb" : "arrow";
+    let dmg = (type === "bomb" ? 40 : 20) * t.diff;
+
+    projectiles.push({ 
+        x: startX, 
+        y: startY, 
+        vx: -Math.cos(angleRad) * finalVel, 
+        vy: -Math.sin(angleRad) * finalVel, 
+        g: g,
+        dmg: dmg, 
+        owner: 'e', 
+        type: type, 
+        leg: false,
+        angle: 0
+    });
+}
+
+        function draw() {
+            const t = TOWERS[game.tower] || TOWERS[TOWERS.length-1];
+            ctx.fillStyle = t.bg; ctx.fillRect(0,0,canvas.width, canvas.height);
+            ctx.fillStyle = "#333"; ctx.fillRect(wall.x, wall.y, wall.w, wall.h);
+            ctx.fillStyle = "#0a0a0a"; ctx.fillRect(0, canvas.height - 130, canvas.width, 130);
+            drawEntity(imgP, player.x, canvas.height, false);
+            drawEntity(imgE, enemy.x, canvas.height, true);
+            if (isAiming && turn === 'p') {
+                let w = (game.ownedWeps.includes('leg_'+(game.curWep+1))) ? ARSENAL[game.curWep+3] : ARSENAL[game.curWep];
+                let vx = (tStart.x - tCurr.x) * w.f, vy = (tStart.y - tCurr.y) * w.f, tx = player.x, ty = canvas.height-155;
+                ctx.beginPath(); ctx.strokeStyle = w.leg ? "gold" : "cyan";
+                for (let i=0; i<25; i++) { tx += vx; ty += vy; vy += t.g; ctx.lineTo(tx, ty); if(ty>canvas.height-130) break; }
                 ctx.stroke();
             }
-            if (projectile) {
-                ctx.save(); ctx.translate(projectile.x, projectile.y);
-                if (projectile.vis === 'axe' && imgAxe.complete) { ctx.rotate(Date.now()*0.02); ctx.drawImage(imgAxe, -15, -15, 30, 30); }
-                else {
-                    ctx.rotate(Math.atan2(projectile.vy, projectile.vx) + Math.PI);
-                    ctx.fillStyle = projectile.vis === 'circle' ? '#f1c40f' : '#fff';
-                    if(projectile.vis === 'circle') { ctx.beginPath(); ctx.arc(0,0,8,0,Math.PI*2); ctx.fill(); }
-                    else ctx.fillRect(-12, -1, 24, 2);
-                }
-                ctx.restore();
+            projectiles.forEach(drawProjectile);
+            particles.forEach((p, i) => { p.life -= 0.03; ctx.fillStyle = p.c; ctx.globalAlpha = p.life; ctx.fillRect(p.x,p.y,2,2); if(p.life <= 0) particles.splice(i,1); });
+            explosions.forEach((e, i) => { e.r += 6; e.a -= 0.03; ctx.beginPath(); ctx.strokeStyle=`rgba(255,200,0,${e.a})`; ctx.arc(e.x,e.y,e.r,0,7); ctx.stroke(); if(e.a<=0) explosions.splice(i,1); });
+            ctx.globalAlpha = 1;
+        }
+
+        function resize() { canvas.width = window.innerWidth; canvas.height = window.innerHeight; }
+        function exitBattle() { canvas.style.display='none'; document.getElementById('hub').style.display='flex'; document.getElementById('battle-ui').style.display='none'; updateHubUI(); }
+
+        canvas.addEventListener('pointerdown', e => { if(turn === 'p' && projectiles.length === 0 && e.clientY < canvas.height - 100) { isAiming = true; tStart = {x:e.clientX, y:e.clientY}; tCurr = {x:e.clientX, y:e.clientY}; }});
+        canvas.addEventListener('pointermove', e => { if(isAiming) tCurr = {x:e.clientX, y:e.clientY}; });
+        canvas.addEventListener('pointerup', e => {
+            if(isAiming) {
+                isAiming = false; 
+                let w = (game.ownedWeps.includes('leg_'+(game.curWep+1))) ? ARSENAL[game.curWep+3] : ARSENAL[game.curWep];
+                if(game.gold >= w.p) { game.gold -= w.p; projectiles.push({ x: player.x, y: canvas.height - 155, vx: (tStart.x - e.clientX)*w.f, vy: (tStart.y - e.clientY)*w.f, dmg: game.stats.dmg * w.d, owner: 'p', type: w.type, leg: w.leg }); updateBattleUI(); }
             }
-            document.getElementById('b-gold').innerText = Math.floor(game.gold);
-            document.getElementById('b-status').innerText = turn === 'p' ? "ВАШ ХОД" : "ВРАГ ЦЕЛИТСЯ";
-        }
-
-        function drawHuman(x, y, color, scale, hp, showBow) {
-            const s = (canvas.height / 850) * scale;
-            ctx.fillStyle = color;
-            ctx.fillRect(x - 10*s, y - 35*s, 20*s, 25*s);
-            ctx.beginPath(); ctx.arc(x, y - 45*s + Math.sin(Date.now()/200)*4, 10*s, 0, Math.PI*2); ctx.fill();
-            ctx.fillStyle = hp > 30 ? "#0f0" : "#f00"; ctx.font = `bold ${16*s}px Arial`; ctx.textAlign = "center";
-            ctx.fillText(Math.ceil(hp), x, y - 75*s);
-            if (showBow) {
-                ctx.save(); ctx.translate(x, y - 25*s);
-                ctx.rotate(Math.atan2(tStart.y - tCurr.y, tStart.x - tCurr.x) + Math.PI);
-                if (imgBow.complete && imgBow.width > 0) ctx.drawImage(imgBow, -30*s, -15*s, 30*s, 30*s);
-                else { ctx.strokeStyle="white"; ctx.lineWidth=3; ctx.beginPath(); ctx.arc(0,0,20*s,-1,1); ctx.stroke(); }
-                ctx.restore();
-            }
-        }
-
-        function aiFire() { 
-            const t = TOWERS[game.tower] || TOWERS[0];
-            projectile = { x: enemy.x, y: canvas.height-130-25, vx: (player.x-enemy.x)*0.08, vy: -12, g: t.g, owner: 'e', dmg: 20+(game.tower*10), vis: 'circle' }; 
-        }
-        
-        function exitBattle() { canvas.style.display='none'; document.getElementById('hub').style.display='flex'; document.getElementById('weaponDock').style.display='none'; document.getElementById('battle-top-ui').style.display='none'; updateHubUI(); }
-
-        canvas.addEventListener('touchstart', e => {
-            if (turn !== 'p' || isWaiting || canvas.style.display !== 'block') return;
-            const t = e.touches[0]; if (t.clientY < 180) return;
-            isAiming = true; tStart = { x: t.clientX, y: t.clientY }; tCurr = {...tStart};
-        }, { passive: false });
-
-        canvas.addEventListener('touchmove', e => {
-            if (!isAiming) return;
-            const t = e.touches[0]; tCurr = { x: t.clientX, y: t.clientY };
-            if (e.cancelable) e.preventDefault();
-        }, { passive: false });
-
-        canvas.addEventListener('touchend', () => {
-            if (!isAiming) return; isAiming = false;
-            let vx = (tStart.x - tCurr.x)*0.22, vy = (tStart.y - tCurr.y)*0.22;
-            if (Math.hypot(vx, vy) < 5 || (game.curWep > 0 && game.ammo[game.curWep] <= 0)) return;
-            isWaiting = true;
-            const w = ARSENAL[game.curWep], t = TOWERS[game.tower] || TOWERS[0];
-            projectile = { x: player.x, y: canvas.height - 130 - 25, vx, vy, g: w.g * (t.g / 0.22), owner: 'p', dmg: w.d + (game.stats.dmg-1)*12, vis: w.vis };
-            if (game.curWep > 0) game.ammo[game.curWep]--; updateAmmoUI();
         });
 
-        const saved = localStorage.getItem('cryptoArcherFinalSaveSystem');
-        if (saved) { game = JSON.parse(saved); document.getElementById('reg-screen').style.display='none'; document.getElementById('hub').style.display='flex'; updateHubUI(); }
-        requestAnimationFrame(mainLoop);
+        const saved = localStorage.getItem('nomad_v_ultimate_final');
+        if(saved) { game = JSON.parse(saved); document.getElementById('reg-screen').style.display = 'none'; document.getElementById('hub').style.display = 'flex'; setSkin(game.skinIdx); }
+
+        function loop(t) {
+            const dt = t - lastTime; lastTime = t;
+            if (document.getElementById('hub').style.display === 'flex') {
+                game.mine += 0.03 * (dt || 16);
+                if (game.mine >= 100) { game.chips++; game.mine = 0; save(); updateHubUI(); }
+                document.getElementById('mine-fill').style.width = game.mine + "%";
+                document.getElementById('mine-perc').innerText = Math.floor(game.mine) + "%";
+            }
+            if (canvas.style.display === 'block') { update(); draw(); }
+            requestAnimationFrame(loop);
+        }
+        updateHubUI(); resize(); requestAnimationFrame(loop);
     </script>
 </body>
 </html>
